@@ -63,6 +63,12 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      backgroundImage: {
+        "gradient-warm": "var(--gradient-warm)",
+      },
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+      },
       keyframes: {
         "accordion-down": {
           from: {
