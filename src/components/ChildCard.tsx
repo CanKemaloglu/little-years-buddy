@@ -1,7 +1,8 @@
-import { differenceInDays, differenceInWeeks, differenceInMonths, differenceInYears } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { calculateAge } from "@/lib/ageCalculations";
 
 interface ChildCardProps {
   id: string;
@@ -11,23 +12,18 @@ interface ChildCardProps {
 }
 
 export const ChildCard = ({ id, name, birthdate, onDelete }: ChildCardProps) => {
-  const today = new Date();
-  const birth = new Date(birthdate);
-
-  const days = differenceInDays(today, birth);
-  const weeks = Math.floor(differenceInWeeks(today, birth));
-  const months = differenceInMonths(today, birth);
-  const years = differenceInYears(today, birth);
+  const navigate = useNavigate();
+  const age = calculateAge(birthdate);
 
   const getPrimaryDisplay = () => {
-    if (years >= 1) {
-      return { value: years, unit: years === 1 ? "year" : "years" };
-    } else if (months >= 1) {
-      return { value: months, unit: months === 1 ? "month" : "months" };
-    } else if (weeks >= 1) {
-      return { value: weeks, unit: weeks === 1 ? "week" : "weeks" };
+    if (age.years >= 1) {
+      return { value: age.years, unit: age.years === 1 ? "year" : "years" };
+    } else if (age.months >= 1) {
+      return { value: age.months, unit: age.months === 1 ? "month" : "months" };
+    } else if (age.weeks >= 1) {
+      return { value: age.weeks, unit: age.weeks === 1 ? "week" : "weeks" };
     } else {
-      return { value: days, unit: days === 1 ? "day" : "days" };
+      return { value: age.days, unit: age.days === 1 ? "day" : "days" };
     }
   };
 
@@ -59,22 +55,31 @@ export const ChildCard = ({ id, name, birthdate, onDelete }: ChildCardProps) => 
           
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{days}</div>
-              <div className="text-muted-foreground">{days === 1 ? "day" : "days"}</div>
+              <div className="font-semibold text-lg text-foreground">{age.days}</div>
+              <div className="text-muted-foreground">{age.days === 1 ? "day" : "days"}</div>
             </div>
             <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{weeks}</div>
-              <div className="text-muted-foreground">{weeks === 1 ? "week" : "weeks"}</div>
+              <div className="font-semibold text-lg text-foreground">{age.weeks}</div>
+              <div className="text-muted-foreground">{age.weeks === 1 ? "week" : "weeks"}</div>
             </div>
             <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{months}</div>
-              <div className="text-muted-foreground">{months === 1 ? "month" : "months"}</div>
+              <div className="font-semibold text-lg text-foreground">{age.months}</div>
+              <div className="text-muted-foreground">{age.months === 1 ? "month" : "months"}</div>
             </div>
             <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{years}</div>
-              <div className="text-muted-foreground">{years === 1 ? "year" : "years"}</div>
+              <div className="font-semibold text-lg text-foreground">{age.years}</div>
+              <div className="text-muted-foreground">{age.years === 1 ? "year" : "years"}</div>
             </div>
           </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full mt-4"
+            onClick={() => navigate(`/milestones/${id}`)}
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            View Milestones
+          </Button>
           
           <div className="text-xs text-muted-foreground text-center pt-2">
             Born on {new Date(birthdate).toLocaleDateString()}

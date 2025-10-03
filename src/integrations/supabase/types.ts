@@ -38,6 +38,50 @@ export type Database = {
         }
         Relationships: []
       }
+      milestones: {
+        Row: {
+          child_id: string
+          created_at: string
+          description: string | null
+          id: string
+          milestone_date: string
+          photo_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_date: string
+          photo_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_date?: string
+          photo_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestones_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
