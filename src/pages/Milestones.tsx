@@ -11,6 +11,7 @@ interface Child {
   id: string;
   name: string;
   birthdate: string;
+  gender: string;
 }
 
 interface Milestone {
@@ -71,6 +72,16 @@ const Milestones = () => {
       }
     });
   }, [childId, navigate]);
+
+  // Apply theme based on child's gender
+  useEffect(() => {
+    if (child?.gender) {
+      document.documentElement.setAttribute('data-theme', child.gender);
+    }
+    return () => {
+      document.documentElement.removeAttribute('data-theme');
+    };
+  }, [child?.gender]);
 
   const handleDeleteMilestone = async (id: string) => {
     try {

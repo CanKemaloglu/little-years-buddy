@@ -12,6 +12,7 @@ interface Child {
   id: string;
   name: string;
   birthdate: string;
+  gender: string;
 }
 
 const Index = () => {
@@ -137,7 +138,9 @@ const Index = () => {
                 id={child.id}
                 name={child.name}
                 birthdate={child.birthdate}
+                gender={child.gender}
                 onDelete={handleDeleteChild}
+                onUpdate={fetchChildren}
               />
             ))}
           </div>

@@ -42,6 +42,62 @@ All colors MUST be HSL.
     --shadow-soft: 0 4px 20px -4px hsl(350 85% 85% / 0.15);
   }
 
+  /* Boy theme - Blue tones */
+  [data-theme="boy"] {
+    --background: 200 40% 98%;
+    --foreground: 240 10% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 20%;
+
+    --primary: 210 85% 85%;
+    --primary-foreground: 240 10% 20%;
+
+    --secondary: 190 90% 85%;
+    --secondary-foreground: 240 10% 20%;
+
+    --muted: 200 40% 94%;
+    --muted-foreground: 240 5% 50%;
+
+    --accent: 200 60% 88%;
+    --accent-foreground: 240 10% 20%;
+
+    --border: 200 30% 90%;
+    --input: 200 30% 90%;
+    --ring: 210 85% 85%;
+
+    --gradient-warm: linear-gradient(135deg, hsl(210 85% 92%) 0%, hsl(190 90% 92%) 100%);
+    --shadow-soft: 0 4px 20px -4px hsl(210 85% 85% / 0.15);
+  }
+
+  /* Neutral theme - Butter yellow */
+  [data-theme="neutral"] {
+    --background: 45 40% 98%;
+    --foreground: 240 10% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 20%;
+
+    --primary: 45 85% 80%;
+    --primary-foreground: 240 10% 20%;
+
+    --secondary: 50 90% 85%;
+    --secondary-foreground: 240 10% 20%;
+
+    --muted: 45 40% 94%;
+    --muted-foreground: 240 5% 50%;
+
+    --accent: 48 60% 88%;
+    --accent-foreground: 240 10% 20%;
+
+    --border: 45 30% 90%;
+    --input: 45 30% 90%;
+    --ring: 45 85% 80%;
+
+    --gradient-warm: linear-gradient(135deg, hsl(45 85% 90%) 0%, hsl(50 90% 92%) 100%);
+    --shadow-soft: 0 4px 20px -4px hsl(45 85% 80% / 0.15);
+  }
+
   .dark {
     --background: 240 15% 12%;
     --foreground: 210 40% 98%;
@@ -73,6 +129,22 @@ All colors MUST be HSL.
 
     --gradient-warm: linear-gradient(135deg, hsl(350 75% 30%) 0%, hsl(200 80% 30%) 100%);
     --shadow-soft: 0 4px 20px -4px hsl(350 75% 20% / 0.3);
+  }
+
+  [data-theme="boy"].dark {
+    --primary: 210 75% 70%;
+    --secondary: 190 80% 70%;
+    --ring: 210 75% 70%;
+    --gradient-warm: linear-gradient(135deg, hsl(210 75% 30%) 0%, hsl(190 80% 30%) 100%);
+    --shadow-soft: 0 4px 20px -4px hsl(210 75% 20% / 0.3);
+  }
+
+  [data-theme="neutral"].dark {
+    --primary: 45 75% 60%;
+    --secondary: 50 80% 65%;
+    --ring: 45 75% 60%;
+    --gradient-warm: linear-gradient(135deg, hsl(45 75% 25%) 0%, hsl(50 80% 28%) 100%);
+    --shadow-soft: 0 4px 20px -4px hsl(45 75% 15% / 0.3);
   }
 }
 

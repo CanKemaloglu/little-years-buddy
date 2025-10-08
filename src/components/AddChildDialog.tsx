@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
+  const [gender, setGender] = useState("neutral");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,6 +57,7 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
             user_id: user.id,
             name: name.trim(),
             birthdate,
+            gender,
           },
         ]);
 
@@ -63,6 +66,7 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
       toast.success(`${name} has been added!`);
       setName("");
       setBirthdate("");
+      setGender("neutral");
       setOpen(false);
       onChildAdded();
     } catch (error) {
@@ -108,6 +112,29 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
               max={new Date().toISOString().split("T")[0]}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Gender</Label>
+            <RadioGroup value={gender} onValueChange={setGender}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="girl" id="girl" />
+                <Label htmlFor="girl" className="font-normal cursor-pointer">
+                  Kız
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="boy" id="boy" />
+                <Label htmlFor="boy" className="font-normal cursor-pointer">
+                  Erkek
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="neutral" id="neutral" />
+                <Label htmlFor="neutral" className="font-normal cursor-pointer">
+                  Cinsiyetçi davranmak istemiyorum
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Adding..." : "Add Child"}

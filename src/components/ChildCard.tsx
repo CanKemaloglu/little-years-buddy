@@ -3,15 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
+import { EditChildDialog } from "./EditChildDialog";
 
 interface ChildCardProps {
   id: string;
   name: string;
   birthdate: string;
+  gender: string;
   onDelete: (id: string) => void;
+  onUpdate: () => void;
 }
 
-export const ChildCard = ({ id, name, birthdate, onDelete }: ChildCardProps) => {
+export const ChildCard = ({ id, name, birthdate, gender, onDelete, onUpdate }: ChildCardProps) => {
   const navigate = useNavigate();
   const age = calculateAge(birthdate);
 
@@ -33,14 +36,23 @@ export const ChildCard = ({ id, name, birthdate, onDelete }: ChildCardProps) => 
     <Card className="shadow-soft hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-semibold">{name}</CardTitle>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(id)}
-          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-1">
+          <EditChildDialog
+            id={id}
+            name={name}
+            birthdate={birthdate}
+            gender={gender}
+            onChildUpdated={onUpdate}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(id)}
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

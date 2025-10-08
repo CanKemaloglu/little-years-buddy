@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           birthdate: string
           created_at: string
+          gender: string
           id: string
           name: string
           user_id: string
@@ -25,6 +26,7 @@ export type Database = {
         Insert: {
           birthdate: string
           created_at?: string
+          gender?: string
           id?: string
           name: string
           user_id: string
@@ -32,6 +34,7 @@ export type Database = {
         Update: {
           birthdate?: string
           created_at?: string
+          gender?: string
           id?: string
           name?: string
           user_id?: string
