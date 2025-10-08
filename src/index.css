@@ -70,33 +70,33 @@ All colors MUST be HSL.
     --shadow-soft: 0 4px 20px -4px hsl(210 85% 85% / 0.15);
   }
 
-/* Girl theme - Pink tones */
-[data-theme="girl"] {
-  --background: 330 40% 98%;
-  --foreground: 240 10% 20%;
-
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 20%;
-
-  --primary: 330 80% 85%;
-  --primary-foreground: 240 10% 20%;
-
-  --secondary: 340 90% 88%;
-  --secondary-foreground: 240 10% 20%;
-
-  --muted: 330 40% 94%;
-  --muted-foreground: 240 5% 50%;
-
-  --accent: 340 60% 88%;
-  --accent-foreground: 240 10% 20%;
-
-  --border: 330 30% 90%;
-  --input: 330 30% 90%;
-  --ring: 330 80% 85%;
-
-  --gradient-warm: linear-gradient(135deg, hsl(330 80% 92%) 0%, hsl(340 90% 92%) 100%);
-  --shadow-soft: 0 4px 20px -4px hsl(330 80% 85% / 0.15);
-}
+  /* Girl theme - Pink tones */
+  [data-theme="girl"] {
+    --background: 330 40% 98%;
+    --foreground: 240 10% 20%;
+  
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 20%;
+  
+    --primary: 330 80% 85%;
+    --primary-foreground: 240 10% 20%;
+  
+    --secondary: 340 90% 88%;
+    --secondary-foreground: 240 10% 20%;
+  
+    --muted: 330 40% 94%;
+    --muted-foreground: 240 5% 50%;
+  
+    --accent: 340 60% 88%;
+    --accent-foreground: 240 10% 20%;
+  
+    --border: 330 30% 90%;
+    --input: 330 30% 90%;
+    --ring: 330 80% 85%;
+  
+    --gradient-warm: linear-gradient(135deg, hsl(330 80% 92%) 0%, hsl(340 90% 92%) 100%);
+    --shadow-soft: 0 4px 20px -4px hsl(330 80% 85% / 0.15);
+  }
   
   /* Neutral theme - Butter yellow */
   [data-theme="neutral"] {
