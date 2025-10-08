@@ -70,6 +70,34 @@ All colors MUST be HSL.
     --shadow-soft: 0 4px 20px -4px hsl(210 85% 85% / 0.15);
   }
 
+/* Girl theme - Pink tones */
+[data-theme="girl"] {
+  --background: 330 40% 98%;
+  --foreground: 240 10% 20%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 20%;
+
+  --primary: 330 80% 85%;
+  --primary-foreground: 240 10% 20%;
+
+  --secondary: 340 90% 88%;
+  --secondary-foreground: 240 10% 20%;
+
+  --muted: 330 40% 94%;
+  --muted-foreground: 240 5% 50%;
+
+  --accent: 340 60% 88%;
+  --accent-foreground: 240 10% 20%;
+
+  --border: 330 30% 90%;
+  --input: 330 30% 90%;
+  --ring: 330 80% 85%;
+
+  --gradient-warm: linear-gradient(135deg, hsl(330 80% 92%) 0%, hsl(340 90% 92%) 100%);
+  --shadow-soft: 0 4px 20px -4px hsl(330 80% 85% / 0.15);
+}
+  
   /* Neutral theme - Butter yellow */
   [data-theme="neutral"] {
     --background: 45 40% 98%;
@@ -139,6 +167,15 @@ All colors MUST be HSL.
     --shadow-soft: 0 4px 20px -4px hsl(210 75% 20% / 0.3);
   }
 
+/* Girl theme - Dark mode */
+[data-theme="girl"].dark {
+  --primary: 330 70% 75%;
+  --secondary: 340 75% 70%;
+  --ring: 330 70% 75%;
+  --gradient-warm: linear-gradient(135deg, hsl(330 70% 30%) 0%, hsl(340 75% 30%) 100%);
+  --shadow-soft: 0 4px 20px -4px hsl(330 70% 20% / 0.3);
+}
+  
   [data-theme="neutral"].dark {
     --primary: 45 75% 60%;
     --secondary: 50 80% 65%;
