@@ -174,6 +174,7 @@ const Milestones = () => {
                   photoUrl={milestone.photo_url || undefined}
                   childBirthdate={child.birthdate}
                   onDelete={handleDeleteMilestone}
+                  onUpdate={fetchChildAndMilestones}
                 />
               ))}
             </div>

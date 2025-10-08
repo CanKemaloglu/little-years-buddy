@@ -7,6 +7,7 @@ import { ChildCard } from "@/components/ChildCard";
 import { AddChildDialog } from "@/components/AddChildDialog";
 import { LogOut, Baby } from "lucide-react";
 import { toast } from "sonner";
+import { checkForCelebration, triggerCelebration } from "@/lib/celebrationUtils";
 
 interface Child {
   id: string;
@@ -30,6 +31,17 @@ const Index = () => {
 
       if (error) throw error;
       setChildren(data || []);
+      
+      // Check for celebrations
+      data?.forEach((child) => {
+        const celebration = checkForCelebration(child.birthdate);
+        if (celebration) {
+          toast.success(celebration.message, {
+            duration: celebration.type === "year" ? 8000 : celebration.type === "month" ? 5000 : 3000,
+          });
+          triggerCelebration(celebration.type);
+        }
+      });
     } catch (error) {
       console.error("Error fetching children:", error);
       toast.error("Failed to load children");
@@ -93,7 +105,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-warm">
+    <div className="min-h-screen bg-gradient-warm" data-theme="neutral">
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
