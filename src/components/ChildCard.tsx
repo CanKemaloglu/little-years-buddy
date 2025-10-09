@@ -39,7 +39,7 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, onDelete, onUpd
 
   return (
     <Card className="shadow-soft hover:shadow-lg transition-shadow relative overflow-hidden" data-theme={gender}>
-      <div className={`absolute top-2 left-1 -translate-x-1/2 text-6xl ${animalChar.animation}`}>
+      <div className={`absolute top-4 left-1/2 -translate-x-1 text-6xl ${animalChar.animation}`}>
         {animalChar.emoji}
       </div>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
