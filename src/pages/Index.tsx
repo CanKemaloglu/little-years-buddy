@@ -8,6 +8,7 @@ import { AddChildDialog } from "@/components/AddChildDialog";
 import { LogOut, Baby } from "lucide-react";
 import { toast } from "sonner";
 import { checkForCelebration, triggerCelebration } from "@/lib/celebrationUtils";
+import { AIChatDialog } from "@/components/AIChatDialog";
 
 interface Child {
   id: string;
@@ -114,9 +115,12 @@ const Index = () => {
             </div>
             <h1 className="text-2xl font-bold">Little Tracker</h1>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleSignOut}>
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <AIChatDialog />
+            <Button variant="ghost" size="icon" onClick={handleSignOut}>
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
