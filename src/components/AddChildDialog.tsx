@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { animals } from "@/lib/animalCharacters";
 
 interface AddChildDialogProps {
   onChildAdded: () => void;
@@ -17,6 +18,7 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [gender, setGender] = useState("neutral");
+  const [animal, setAnimal] = useState("bunny");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,6 +60,7 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
             name: name.trim(),
             birthdate,
             gender,
+            animal,
           },
         ]);
 
@@ -67,6 +70,7 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
       setName("");
       setBirthdate("");
       setGender("neutral");
+      setAnimal("bunny");
       setOpen(false);
       onChildAdded();
     } catch (error) {
@@ -135,6 +139,26 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+          <div className="space-y-2">
+            <Label>Karakter</Label>
+            <div className="grid grid-cols-5 gap-2">
+              {animals.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => setAnimal(a.id)}
+                  className={`p-3 rounded-lg border-2 transition-all hover:scale-110 ${
+                    animal === a.id
+                      ? "border-primary bg-primary/10 scale-110"
+                      : "border-muted hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-3xl">{a.emoji}</div>
+                  <div className="text-xs mt-1">{a.name}</div>
+                </button>
+              ))}
+            </div>
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Adding..." : "Add Child"}

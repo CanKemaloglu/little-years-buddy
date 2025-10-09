@@ -5,20 +5,23 @@ import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
 import { getZodiacSign } from "@/lib/zodiacUtils";
+import { getAnimalById } from "@/lib/animalCharacters";
 
 interface ChildCardProps {
   id: string;
   name: string;
   birthdate: string;
   gender: string;
+  animal: string;
   onDelete: (id: string) => void;
   onUpdate: () => void;
 }
 
-export const ChildCard = ({ id, name, birthdate, gender, onDelete, onUpdate }: ChildCardProps) => {
+export const ChildCard = ({ id, name, birthdate, gender, animal, onDelete, onUpdate }: ChildCardProps) => {
   const navigate = useNavigate();
   const age = calculateAge(birthdate);
   const zodiacSign = getZodiacSign(birthdate);
+  const animalChar = getAnimalById(animal);
 
   const getPrimaryDisplay = () => {
     if (age.years >= 1) {
@@ -35,7 +38,10 @@ export const ChildCard = ({ id, name, birthdate, gender, onDelete, onUpdate }: C
   const primary = getPrimaryDisplay();
 
   return (
-    <Card className="shadow-soft hover:shadow-lg transition-shadow" data-theme={gender}>
+    <Card className="shadow-soft hover:shadow-lg transition-shadow relative overflow-hidden" data-theme={gender}>
+      <div className={`absolute top-4 right-4 text-6xl ${animalChar.animation}`}>
+        {animalChar.emoji}
+      </div>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <CardTitle className="text-xl font-semibold">{name}</CardTitle>
@@ -50,6 +56,7 @@ export const ChildCard = ({ id, name, birthdate, gender, onDelete, onUpdate }: C
             name={name}
             birthdate={birthdate}
             gender={gender}
+            animal={animal}
             onChildUpdated={onUpdate}
           />
           <Button
