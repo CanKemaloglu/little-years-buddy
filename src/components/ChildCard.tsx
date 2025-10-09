@@ -4,6 +4,7 @@ import { Trash2, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
+import { getZodiacSign } from "@/lib/zodiacUtils";
 
 interface ChildCardProps {
   id: string;
@@ -17,6 +18,7 @@ interface ChildCardProps {
 export const ChildCard = ({ id, name, birthdate, gender, onDelete, onUpdate }: ChildCardProps) => {
   const navigate = useNavigate();
   const age = calculateAge(birthdate);
+  const zodiacSign = getZodiacSign(birthdate);
 
   const getPrimaryDisplay = () => {
     if (age.years >= 1) {
@@ -35,7 +37,13 @@ export const ChildCard = ({ id, name, birthdate, gender, onDelete, onUpdate }: C
   return (
     <Card className="shadow-soft hover:shadow-lg transition-shadow" data-theme={gender}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-semibold">{name}</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-xl font-semibold">{name}</CardTitle>
+          <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-full text-xs">
+            <span className="text-base">{zodiacSign.emoji}</span>
+            <span className="text-muted-foreground">{zodiacSign.name}</span>
+          </div>
+        </div>
         <div className="flex gap-1">
           <EditChildDialog
             id={id}
