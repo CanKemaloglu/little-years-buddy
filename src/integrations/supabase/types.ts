@@ -16,7 +16,6 @@ export type Database = {
     Tables: {
       children: {
         Row: {
-          animal: string
           birthdate: string
           created_at: string
           gender: string
@@ -25,7 +24,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          animal?: string
           birthdate: string
           created_at?: string
           gender?: string
@@ -34,7 +32,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          animal?: string
           birthdate?: string
           created_at?: string
           gender?: string

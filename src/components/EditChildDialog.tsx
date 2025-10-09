@@ -7,23 +7,20 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { animals } from "@/lib/animalCharacters";
 
 interface EditChildDialogProps {
   id: string;
   name: string;
   birthdate: string;
   gender: string;
-  animal: string;
   onChildUpdated: () => void;
 }
 
-export const EditChildDialog = ({ id, name, birthdate, gender, animal, onChildUpdated }: EditChildDialogProps) => {
+export const EditChildDialog = ({ id, name, birthdate, gender, onChildUpdated }: EditChildDialogProps) => {
   const [open, setOpen] = useState(false);
   const [childName, setChildName] = useState(name);
   const [childBirthdate, setChildBirthdate] = useState(birthdate);
   const [childGender, setChildGender] = useState(gender);
-  const [childAnimal, setChildAnimal] = useState(animal);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +52,6 @@ export const EditChildDialog = ({ id, name, birthdate, gender, animal, onChildUp
           name: childName.trim(),
           birthdate: childBirthdate,
           gender: childGender,
-          animal: childAnimal,
         })
         .eq("id", id);
 
@@ -128,27 +124,6 @@ export const EditChildDialog = ({ id, name, birthdate, gender, animal, onChildUp
                 </Label>
               </div>
             </RadioGroup>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Karakter</Label>
-            <div className="grid grid-cols-5 gap-2">
-              {animals.map((a) => (
-                <button
-                  key={a.id}
-                  type="button"
-                  onClick={() => setChildAnimal(a.id)}
-                  className={`p-3 rounded-lg border-2 transition-all hover:scale-110 ${
-                    childAnimal === a.id
-                      ? "border-primary bg-primary/10 scale-110"
-                      : "border-muted hover:border-primary/50"
-                  }`}
-                >
-                  <div className="text-3xl">{a.emoji}</div>
-                  <div className="text-xs mt-1">{a.name}</div>
-                </button>
-              ))}
-            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>

@@ -86,32 +86,10 @@ export default {
             height: "0",
           },
         },
-        wiggle: {
-          "0%, 100%": { transform: "rotate(-3deg)" },
-          "50%": { transform: "rotate(3deg)" },
-        },
-        sway: {
-          "0%, 100%": { transform: "translateX(-5px)" },
-          "50%": { transform: "translateX(5px)" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        wave: {
-          "0%": { transform: "rotate(0deg)" },
-          "25%": { transform: "rotate(10deg)" },
-          "75%": { transform: "rotate(-10deg)" },
-          "100%": { transform: "rotate(0deg)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        wiggle: "wiggle 2s ease-in-out infinite",
-        sway: "sway 3s ease-in-out infinite",
-        float: "float 3s ease-in-out infinite",
-        wave: "wave 2.5s ease-in-out infinite",
       },
     },
   },
