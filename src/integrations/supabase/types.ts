@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      child_shares: {
+        Row: {
+          child_id: string
+          created_at: string
+          created_by: string
+          id: string
+          shared_with_user_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          shared_with_user_id: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          shared_with_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_shares_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       children: {
         Row: {
           animal: string

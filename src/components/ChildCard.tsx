@@ -4,6 +4,7 @@ import { Trash2, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
+import { ShareChildDialog } from "./ShareChildDialog";
 import { getZodiacSign } from "@/lib/zodiacUtils";
 import { getAnimalById } from "@/lib/animalCharacters";
 
@@ -51,6 +52,7 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, onDelete, onUpd
           </div>
         </div>
         <div className="flex gap-1">
+          <ShareChildDialog childId={id} childName={name} />
           <EditChildDialog
             id={id}
             name={name}
