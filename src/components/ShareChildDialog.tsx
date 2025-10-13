@@ -10,79 +10,77 @@ import { toast } from "sonner";
 interface ShareChildDialogProps {
   childId: string;
   childName: string;
+  isOwner: boolean;
 }
 
 interface SharedUser {
   id: string;
   shared_with_user_id: string;
-  email?: string;
+  email: string;
 }
 
-export const ShareChildDialog = ({ childId, childName }: ShareChildDialogProps) => {
+export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDialogProps) => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
 
-  const fetchSharedUsers = async () => {
-    const { data, error } = await supabase
-      .from("child_shares")
-      .select("id, shared_with_user_id")
-      .eq("child_id", childId);
-
-    if (error) {
-      console.error("Error fetching shared users:", error);
-      return;
-    }
-
-    setSharedUsers(data || []);
-  };
-
   useEffect(() => {
-    if (open) {
-      fetchSharedUsers();
+    if (open && isOwner) {
+      loadSharedUsers();
     }
-  }, [open, childId]);
+  }, [open, childId, isOwner]);
+
+  const loadSharedUsers = async () => {
+    try {
+      const { data: shares, error } = await supabase
+        .from("child_shares")
+        .select("id, shared_with_user_id")
+        .eq("child_id", childId);
+
+      if (error) throw error;
+
+      // For now, just show the user IDs since we can't easily get emails without admin
+      setSharedUsers(shares?.map(s => ({
+        id: s.id,
+        shared_with_user_id: s.shared_with_user_id,
+        email: s.shared_with_user_id
+      })) || []);
+    } catch (error) {
+      console.error("Error loading shared users:", error);
+    }
+  };
 
   const handleShare = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!email.trim()) {
-      toast.error("Lütfen email adresi girin");
+      toast.error("Lütfen bir e-posta adresi girin");
       return;
     }
 
     setLoading(true);
 
     try {
-      // First, check if user exists (we can't query auth.users directly, so we'll try to insert and handle errors)
-      const { data: currentUser } = await supabase.auth.getUser();
-      
-      if (!currentUser.user) {
-        toast.error("Oturum açmanız gerekiyor");
+      // We'll use a Supabase edge function to handle this
+      const { data, error } = await supabase.functions.invoke('share-child', {
+        body: {
+          childId,
+          email: email.trim()
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        toast.error(data.error);
+        setLoading(false);
         return;
       }
 
-      // Try to share - if user doesn't exist or other error, it will fail
-      const { error } = await supabase
-        .from("child_shares")
-        .insert({
-          child_id: childId,
-          shared_with_user_id: email.trim(), // Note: In production, you'd need to look up user ID by email
-          created_by: currentUser.user.id,
-        });
-
-      if (error) {
-        if (error.code === "23505") {
-          toast.error("Bu kullanıcı zaten paylaşıldı");
-        } else {
-          throw error;
-        }
-      } else {
-        toast.success(`${childName} ${email} ile paylaşıldı!`);
-        setEmail("");
-        fetchSharedUsers();
-      }
+      toast.success("Çocuk başarıyla paylaşıldı!");
+      setEmail("");
+      loadSharedUsers();
     } catch (error) {
       console.error("Error sharing child:", error);
       toast.error("Paylaşım sırasında bir hata oluştu");
@@ -101,7 +99,7 @@ export const ShareChildDialog = ({ childId, childName }: ShareChildDialogProps) 
       if (error) throw error;
 
       toast.success("Paylaşım kaldırıldı");
-      fetchSharedUsers();
+      loadSharedUsers();
     } catch (error) {
       console.error("Error removing share:", error);
       toast.error("Paylaşım kaldırılırken bir hata oluştu");
@@ -117,51 +115,52 @@ export const ShareChildDialog = ({ childId, childName }: ShareChildDialogProps) 
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{childName} - Aile Paylaşımı</DialogTitle>
+          <DialogTitle>{childName} - Aile Hesabı Yönetimi</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleShare} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Adresi</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ornek@email.com"
-              required
-            />
-            <p className="text-sm text-muted-foreground">
-              Bu email adresine sahip kullanıcı çocuğunuzu görebilecek ve düzenleyebilecek
-            </p>
-          </div>
+        {isOwner ? (
+          <div className="space-y-4">
+            <form onSubmit={handleShare} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Kullanıcı E-posta</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="kullanici@ornek.com"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Paylaşılıyor..." : "Paylaş"}
+              </Button>
+            </form>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Paylaşılıyor..." : "Paylaş"}
-          </Button>
-        </form>
-
-        {sharedUsers.length > 0 && (
-          <div className="mt-6 space-y-2">
-            <Label>Paylaşılan Kullanıcılar</Label>
-            <div className="space-y-2">
-              {sharedUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between p-2 rounded-lg bg-muted"
-                >
-                  <span className="text-sm">{user.shared_with_user_id}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => handleRemoveShare(user.id)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+            {sharedUsers.length > 0 && (
+              <div className="space-y-2">
+                <Label>Paylaşılan Kullanıcılar</Label>
+                <div className="space-y-2">
+                  {sharedUsers.map((user) => (
+                    <div key={user.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                      <span className="text-sm">{user.email}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleRemoveShare(user.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-muted-foreground">Bu çocuk sizinle paylaşılmış bir çocuktur.</p>
           </div>
         )}
       </DialogContent>

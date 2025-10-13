@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Sparkles } from "lucide-react";
@@ -7,6 +8,7 @@ import { EditChildDialog } from "./EditChildDialog";
 import { ShareChildDialog } from "./ShareChildDialog";
 import { getZodiacSign } from "@/lib/zodiacUtils";
 import { getAnimalById } from "@/lib/animalCharacters";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChildCardProps {
   id: string;
@@ -14,15 +16,23 @@ interface ChildCardProps {
   birthdate: string;
   gender: string;
   animal: string;
+  userId: string;
   onDelete: (id: string) => void;
   onUpdate: () => void;
 }
 
-export const ChildCard = ({ id, name, birthdate, gender, animal, onDelete, onUpdate }: ChildCardProps) => {
+export const ChildCard = ({ id, name, birthdate, gender, animal, userId, onDelete, onUpdate }: ChildCardProps) => {
   const navigate = useNavigate();
   const age = calculateAge(birthdate);
   const zodiacSign = getZodiacSign(birthdate);
   const animalChar = getAnimalById(animal);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setCurrentUser(user?.id || null);
+    });
+  }, []);
 
   const getPrimaryDisplay = () => {
     if (age.years >= 1) {
@@ -52,7 +62,7 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, onDelete, onUpd
           </div>
         </div>
         <div className="flex gap-1">
-          <ShareChildDialog childId={id} childName={name} />
+          <ShareChildDialog childId={id} childName={name} isOwner={currentUser === userId} />
           <EditChildDialog
             id={id}
             name={name}
