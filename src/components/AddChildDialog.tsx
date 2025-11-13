@@ -19,6 +19,8 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
   const [birthdate, setBirthdate] = useState("");
   const [gender, setGender] = useState("neutral");
   const [animal, setAnimal] = useState("bunny");
+  const [fatherName, setFatherName] = useState("");
+  const [motherName, setMotherName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,6 +63,8 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
             birthdate,
             gender,
             animal,
+            father_name: fatherName.trim() || null,
+            mother_name: motherName.trim() || null,
           },
         ]);
 
@@ -71,6 +75,8 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
       setBirthdate("");
       setGender("neutral");
       setAnimal("bunny");
+      setFatherName("");
+      setMotherName("");
       setOpen(false);
       onChildAdded();
     } catch (error) {
@@ -115,6 +121,24 @@ export const AddChildDialog = ({ onChildAdded }: AddChildDialogProps) => {
               onChange={(e) => setBirthdate(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
               required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="father-name">Father's Name</Label>
+            <Input
+              id="father-name"
+              placeholder="Enter father's name (optional)"
+              value={fatherName}
+              onChange={(e) => setFatherName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mother-name">Mother's Name</Label>
+            <Input
+              id="mother-name"
+              placeholder="Enter mother's name (optional)"
+              value={motherName}
+              onChange={(e) => setMotherName(e.target.value)}
             />
           </div>
           <div className="space-y-2">
