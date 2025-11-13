@@ -29,7 +29,7 @@ serve(async (req) => {
       )
     }
 
-    const { childId, email } = await req.json()
+    const { childId, email, role } = await req.json()
 
     // Get user by email using admin API
     const { data: { users }, error: listError } = await supabaseClient.auth.admin.listUsers()
@@ -82,7 +82,8 @@ serve(async (req) => {
       .insert({
         child_id: childId,
         shared_with_user_id: targetUser.id,
-        created_by: user.id
+        created_by: user.id,
+        role: role || null
       })
 
     if (shareError) {

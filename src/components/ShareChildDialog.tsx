@@ -17,11 +17,13 @@ interface SharedUser {
   id: string;
   shared_with_user_id: string;
   email: string;
+  role?: 'father' | 'mother' | null;
 }
 
 export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDialogProps) => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState<'father' | 'mother'>('father');
   const [loading, setLoading] = useState(false);
   const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
 
@@ -35,7 +37,7 @@ export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDial
     try {
       const { data: shares, error } = await supabase
         .from("child_shares")
-        .select("id, shared_with_user_id")
+        .select("id, shared_with_user_id, role")
         .eq("child_id", childId);
 
       if (error) throw error;
@@ -44,7 +46,8 @@ export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDial
       setSharedUsers(shares?.map(s => ({
         id: s.id,
         shared_with_user_id: s.shared_with_user_id,
-        email: s.shared_with_user_id
+        email: s.shared_with_user_id,
+        role: s.role
       })) || []);
     } catch (error) {
       console.error("Error loading shared users:", error);
@@ -66,7 +69,8 @@ export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDial
       const { data, error } = await supabase.functions.invoke('share-child', {
         body: {
           childId,
-          email: email.trim()
+          email: email.trim(),
+          role: role
         }
       });
 
@@ -80,6 +84,7 @@ export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDial
 
       toast.success("Çocuk başarıyla paylaşıldı!");
       setEmail("");
+      setRole('father');
       loadSharedUsers();
     } catch (error) {
       console.error("Error sharing child:", error);
@@ -132,6 +137,29 @@ export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDial
                   required
                 />
               </div>
+              
+              <div className="space-y-2">
+                <Label>Rol</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={role === 'father' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setRole('father')}
+                  >
+                    👨 Baba
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={role === 'mother' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setRole('mother')}
+                  >
+                    👩 Anne
+                  </Button>
+                </div>
+              </div>
+              
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Paylaşılıyor..." : "Paylaş"}
               </Button>
@@ -143,7 +171,17 @@ export const ShareChildDialog = ({ childId, childName, isOwner }: ShareChildDial
                 <div className="space-y-2">
                   {sharedUsers.map((user) => (
                     <div key={user.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                      <span className="text-sm">{user.email}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">
+                          {user.role === 'father' ? '👨' : user.role === 'mother' ? '👩' : '👤'}
+                        </span>
+                        <div className="flex flex-col">
+                          <span className="text-sm">{user.email}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {user.role === 'father' ? 'Baba' : user.role === 'mother' ? 'Anne' : 'Rol seçilmemiş'}
+                          </span>
+                        </div>
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
