@@ -17,11 +17,13 @@ interface ChildCardProps {
   gender: string;
   animal: string;
   userId: string;
+  fatherName?: string | null;
+  motherName?: string | null;
   onDelete: (id: string) => void;
   onUpdate: () => void;
 }
 
-export const ChildCard = ({ id, name, birthdate, gender, animal, userId, onDelete, onUpdate }: ChildCardProps) => {
+export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherName, motherName, onDelete, onUpdate }: ChildCardProps) => {
   const navigate = useNavigate();
   const age = calculateAge(birthdate);
   const zodiacSign = getZodiacSign(birthdate);
@@ -61,6 +63,22 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, onDelet
             <span className="text-muted-foreground">{zodiacSign.name}</span>
           </div>
         </div>
+        {(fatherName || motherName) && (
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-2">
+            {fatherName && (
+              <div className="flex items-center gap-1 px-2 py-1 bg-muted/30 rounded-full">
+                <span className="font-medium">👨 Baba:</span>
+                <span>{fatherName}</span>
+              </div>
+            )}
+            {motherName && (
+              <div className="flex items-center gap-1 px-2 py-1 bg-muted/30 rounded-full">
+                <span className="font-medium">👩 Anne:</span>
+                <span>{motherName}</span>
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex gap-1">
           <ShareChildDialog childId={id} childName={name} isOwner={currentUser === userId} />
           <EditChildDialog
@@ -69,6 +87,8 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, onDelet
             birthdate={birthdate}
             gender={gender}
             animal={animal}
+            fatherName={fatherName}
+            motherName={motherName}
             onChildUpdated={onUpdate}
           />
           <Button

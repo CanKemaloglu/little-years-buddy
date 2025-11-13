@@ -17,6 +17,8 @@ interface Child {
   gender: string;
   animal: string;
   user_id: string;
+  father_name?: string | null;
+  mother_name?: string | null;
 }
 
 const Index = () => {
@@ -159,6 +161,8 @@ const Index = () => {
                 gender={child.gender}
                 animal={child.animal}
                 userId={child.user_id}
+                fatherName={child.father_name}
+                motherName={child.mother_name}
                 onDelete={handleDeleteChild}
                 onUpdate={fetchChildren}
               />

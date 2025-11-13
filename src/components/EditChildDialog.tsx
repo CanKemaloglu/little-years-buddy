@@ -15,15 +15,19 @@ interface EditChildDialogProps {
   birthdate: string;
   gender: string;
   animal: string;
+  fatherName?: string | null;
+  motherName?: string | null;
   onChildUpdated: () => void;
 }
 
-export const EditChildDialog = ({ id, name, birthdate, gender, animal, onChildUpdated }: EditChildDialogProps) => {
+export const EditChildDialog = ({ id, name, birthdate, gender, animal, fatherName, motherName, onChildUpdated }: EditChildDialogProps) => {
   const [open, setOpen] = useState(false);
   const [childName, setChildName] = useState(name);
   const [childBirthdate, setChildBirthdate] = useState(birthdate);
   const [childGender, setChildGender] = useState(gender);
   const [childAnimal, setChildAnimal] = useState(animal);
+  const [childFatherName, setChildFatherName] = useState(fatherName || "");
+  const [childMotherName, setChildMotherName] = useState(motherName || "");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,6 +60,8 @@ export const EditChildDialog = ({ id, name, birthdate, gender, animal, onChildUp
           birthdate: childBirthdate,
           gender: childGender,
           animal: childAnimal,
+          father_name: childFatherName.trim() || null,
+          mother_name: childMotherName.trim() || null,
         })
         .eq("id", id);
 
@@ -103,6 +109,26 @@ export const EditChildDialog = ({ id, name, birthdate, gender, animal, onChildUp
               value={childBirthdate}
               onChange={(e) => setChildBirthdate(e.target.value)}
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-father-name">Baba Adı</Label>
+            <Input
+              id="edit-father-name"
+              value={childFatherName}
+              onChange={(e) => setChildFatherName(e.target.value)}
+              placeholder="Baba adı (opsiyonel)"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-mother-name">Anne Adı</Label>
+            <Input
+              id="edit-mother-name"
+              value={childMotherName}
+              onChange={(e) => setChildMotherName(e.target.value)}
+              placeholder="Anne adı (opsiyonel)"
             />
           </div>
 
