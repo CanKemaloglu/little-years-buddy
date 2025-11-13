@@ -50,12 +50,12 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, onDelet
 
   return (
     <Card className="shadow-soft hover:shadow-lg transition-shadow relative overflow-hidden" data-theme={gender}>
-      <div className={`absolute top-4 left-1/2 -translate-x-1/2 text-6xl ${animalChar.animation}`}>
-        {animalChar.emoji}
-      </div>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold">{name}</CardTitle>
+          <CardTitle className="text-xl font-semibold flex items-center gap-2">
+            {name}
+            <span className={`text-3xl ${animalChar.animation}`}>{animalChar.emoji}</span>
+          </CardTitle>
           <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-full text-xs">
             <span className="text-base">{zodiacSign.emoji}</span>
             <span className="text-muted-foreground">{zodiacSign.name}</span>
