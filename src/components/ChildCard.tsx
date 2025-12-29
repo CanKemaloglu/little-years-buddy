@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, Sparkles } from "lucide-react";
+import { Trash2, Sparkles, Calendar, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
@@ -51,35 +50,34 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
   const primary = getPrimaryDisplay();
 
   return (
-    <Card className="shadow-soft hover:shadow-lg transition-shadow relative overflow-hidden" data-theme={gender}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold flex items-center gap-2">
-            {name}
-            <span className={`text-3xl ${animalChar.animation}`}>{animalChar.emoji}</span>
-          </CardTitle>
-          <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-full text-xs">
-            <span className="text-base">{zodiacSign.emoji}</span>
-            <span className="text-muted-foreground">{zodiacSign.name}</span>
+    <div 
+      className="group relative bg-card rounded-3xl p-6 shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-border/50" 
+      data-theme={gender}
+    >
+      {/* Decorative gradient orb */}
+      <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-warm rounded-full opacity-20 blur-3xl group-hover:opacity-30 transition-opacity duration-500" />
+      
+      {/* Header */}
+      <div className="relative flex items-start justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-warm flex items-center justify-center shadow-md">
+              <span className={`text-3xl ${animalChar.animation}`}>{animalChar.emoji}</span>
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-card border-2 border-border flex items-center justify-center shadow-sm">
+              <span className="text-xs">{zodiacSign.emoji}</span>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-foreground tracking-tight">{name}</h3>
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+              <Calendar className="w-3 h-3" />
+              {new Date(birthdate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </p>
           </div>
         </div>
-        {(fatherName || motherName) && (
-          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-2">
-            {fatherName && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-muted/30 rounded-full">
-                <span className="font-medium">👨 Baba:</span>
-                <span>{fatherName}</span>
-              </div>
-            )}
-            {motherName && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-muted/30 rounded-full">
-                <span className="font-medium">👩 Anne:</span>
-                <span>{motherName}</span>
-              </div>
-            )}
-          </div>
-        )}
-        <div className="flex gap-1">
+        
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <ShareChildDialog childId={id} childName={name} isOwner={currentUser === userId} />
           <EditChildDialog
             id={id}
@@ -95,56 +93,72 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
             variant="ghost"
             size="icon"
             onClick={() => onDelete(id)}
-            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="text-center p-6 bg-gradient-warm rounded-lg">
-            <div className="text-5xl font-bold text-primary-foreground">
+      </div>
+
+      {/* Age Display */}
+      <div className="relative mb-6">
+        <div className="text-center py-8 px-4 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 border border-primary/10">
+          <div className="flex items-baseline justify-center gap-2">
+            <span className="text-6xl font-black text-primary tracking-tighter">
               {primary.value}
-            </div>
-            <div className="text-xl text-primary-foreground mt-2">
-              {primary.unit} old
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{age.days}</div>
-              <div className="text-muted-foreground">{age.days === 1 ? "day" : "days"}</div>
-            </div>
-            <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{age.weeks}</div>
-              <div className="text-muted-foreground">{age.weeks === 1 ? "week" : "weeks"}</div>
-            </div>
-            <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{age.months}</div>
-              <div className="text-muted-foreground">{age.months === 1 ? "month" : "months"}</div>
-            </div>
-            <div className="bg-muted/50 p-3 rounded-lg text-center">
-              <div className="font-semibold text-lg text-foreground">{age.years}</div>
-              <div className="text-muted-foreground">{age.years === 1 ? "year" : "years"}</div>
-            </div>
-          </div>
-          
-          <Button 
-            variant="outline" 
-            className="w-full mt-4"
-            onClick={() => navigate(`/milestones/${id}`)}
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            View Milestones
-          </Button>
-          
-          <div className="text-xs text-muted-foreground text-center pt-2">
-            Born on {new Date(birthdate).toLocaleDateString()}
+            </span>
+            <span className="text-xl font-medium text-primary/70">
+              {primary.unit}
+            </span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      {/* Stats Grid */}
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        {[
+          { value: age.days, label: 'gün' },
+          { value: age.weeks, label: 'hafta' },
+          { value: age.months, label: 'ay' },
+          { value: age.years, label: 'yıl' },
+        ].map((stat, i) => (
+          <div 
+            key={i} 
+            className="text-center p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-300"
+          >
+            <div className="text-lg font-bold text-foreground">{stat.value}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Parents */}
+      {(fatherName || motherName) && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {fatherName && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/40 rounded-full text-xs">
+              <span>👨</span>
+              <span className="text-muted-foreground">{fatherName}</span>
+            </div>
+          )}
+          {motherName && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/40 rounded-full text-xs">
+              <span>👩</span>
+              <span className="text-muted-foreground">{motherName}</span>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Action Button */}
+      <Button 
+        variant="outline" 
+        className="w-full rounded-xl h-12 font-medium border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group/btn"
+        onClick={() => navigate(`/milestones/${id}`)}
+      >
+        <Sparkles className="mr-2 h-4 w-4 group-hover/btn:animate-pulse" />
+        Anıları Görüntüle
+      </Button>
+    </div>
   );
 };

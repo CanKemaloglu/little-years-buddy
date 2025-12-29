@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           created_by: string
           id: string
+          role: Database["public"]["Enums"]["parent_role"] | null
           shared_with_user_id: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           created_at?: string
           created_by: string
           id?: string
+          role?: Database["public"]["Enums"]["parent_role"] | null
           shared_with_user_id: string
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           id?: string
+          role?: Database["public"]["Enums"]["parent_role"] | null
           shared_with_user_id?: string
         }
         Relationships: [
@@ -51,8 +54,10 @@ export type Database = {
           animal: string
           birthdate: string
           created_at: string
+          father_name: string | null
           gender: string
           id: string
+          mother_name: string | null
           name: string
           user_id: string
         }
@@ -60,8 +65,10 @@ export type Database = {
           animal?: string
           birthdate: string
           created_at?: string
+          father_name?: string | null
           gender?: string
           id?: string
+          mother_name?: string | null
           name: string
           user_id: string
         }
@@ -69,8 +76,10 @@ export type Database = {
           animal?: string
           birthdate?: string
           created_at?: string
+          father_name?: string | null
           gender?: string
           id?: string
+          mother_name?: string | null
           name?: string
           user_id?: string
         }
@@ -135,7 +144,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      parent_role: "father" | "mother"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -262,6 +271,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      parent_role: ["father", "mother"],
+    },
   },
 } as const
