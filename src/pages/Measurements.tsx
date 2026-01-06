@@ -35,6 +35,7 @@ interface Child {
   id: string;
   name: string;
   birthdate: string;
+  gender: string;
 }
 
 interface Measurement {
@@ -61,7 +62,7 @@ const Measurements = () => {
       // Fetch child info
       const { data: childData, error: childError } = await supabase
         .from("children")
-        .select("id, name, birthdate")
+        .select("id, name, birthdate, gender")
         .eq("id", childId)
         .maybeSingle();
 
@@ -166,7 +167,7 @@ const Measurements = () => {
                 <CardTitle className="text-lg">Ölçüm Özeti</CardTitle>
               </CardHeader>
               <CardContent>
-                <MeasurementsSummary measurements={measurements} birthdate={child.birthdate} />
+                <MeasurementsSummary measurements={measurements} birthdate={child.birthdate} gender={child.gender} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -177,7 +178,7 @@ const Measurements = () => {
                 <CardTitle className="text-lg">Büyüme Grafikleri</CardTitle>
               </CardHeader>
               <CardContent>
-                <MeasurementsChart measurements={measurements} />
+                <MeasurementsChart measurements={measurements} birthdate={child.birthdate} gender={child.gender} />
               </CardContent>
             </Card>
           </TabsContent>
