@@ -1,7 +1,15 @@
 import { useMemo } from "react";
 import { format, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { TrendingUp, TrendingDown, Minus, Ruler, Scale, Circle } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Ruler, Scale, Circle, Activity } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import {
+  calculateWeightPercentile,
+  calculateHeightPercentile,
+  calculateHeadCircumferencePercentile,
+  type PercentileResult,
+  type Gender,
+} from "@/lib/whoGrowthData";
 
 interface Measurement {
   id: string;
@@ -14,9 +22,71 @@ interface Measurement {
 interface MeasurementsSummaryProps {
   measurements: Measurement[];
   birthdate: string;
+  gender?: string;
 }
 
-export const MeasurementsSummary = ({ measurements, birthdate }: MeasurementsSummaryProps) => {
+const PercentileIndicator = ({ result, label }: { result: PercentileResult | null; label: string }) => {
+  if (!result) return null;
+
+  const getColorClass = (interpretation: PercentileResult['interpretation']) => {
+    switch (interpretation) {
+      case 'very-low':
+        return 'bg-red-500';
+      case 'low':
+        return 'bg-orange-400';
+      case 'normal':
+        return 'bg-green-500';
+      case 'high':
+        return 'bg-blue-400';
+      case 'very-high':
+        return 'bg-purple-500';
+    }
+  };
+
+  const getTextColorClass = (interpretation: PercentileResult['interpretation']) => {
+    switch (interpretation) {
+      case 'very-low':
+        return 'text-red-600';
+      case 'low':
+        return 'text-orange-500';
+      case 'normal':
+        return 'text-green-600';
+      case 'high':
+        return 'text-blue-500';
+      case 'very-high':
+        return 'text-purple-600';
+    }
+  };
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">{label}</span>
+        <span className={`font-semibold ${getTextColorClass(result.interpretation)}`}>
+          %{result.percentile}
+        </span>
+      </div>
+      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+        {/* Background gradient showing percentile zones */}
+        <div className="absolute inset-0 flex">
+          <div className="w-[3%] bg-red-200" />
+          <div className="w-[12%] bg-orange-100" />
+          <div className="w-[70%] bg-green-100" />
+          <div className="w-[12%] bg-blue-100" />
+          <div className="w-[3%] bg-purple-200" />
+        </div>
+        {/* Percentile marker */}
+        <div
+          className={`absolute top-0 h-full w-1.5 rounded-full ${getColorClass(result.interpretation)} shadow-sm transition-all`}
+          style={{ left: `calc(${Math.min(Math.max(result.percentile, 1), 99)}% - 3px)` }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground text-center">{result.interpretationText}</p>
+    </div>
+  );
+};
+
+export const MeasurementsSummary = ({ measurements, birthdate, gender = 'neutral' }: MeasurementsSummaryProps) => {
   const summary = useMemo(() => {
     if (measurements.length === 0) return null;
 
@@ -38,9 +108,22 @@ export const MeasurementsSummary = ({ measurements, birthdate }: MeasurementsSum
 
     // Calculate age at measurement
     const ageInDays = differenceInDays(new Date(latest.measurement_date), new Date(birthdate));
-    const ageMonths = Math.floor(ageInDays / 30);
+    const ageMonths = Math.floor(ageInDays / 30.44); // More accurate month calculation
     const ageYears = Math.floor(ageMonths / 12);
     const remainingMonths = ageMonths % 12;
+
+    // Calculate percentiles
+    const genderForCalc: Gender = gender === 'male' ? 'male' : gender === 'female' ? 'female' : 'male';
+    
+    const weightPercentile = latest.weight_kg
+      ? calculateWeightPercentile(latest.weight_kg, ageMonths, genderForCalc)
+      : null;
+    const heightPercentile = latest.height_cm
+      ? calculateHeightPercentile(latest.height_cm, ageMonths, genderForCalc)
+      : null;
+    const headPercentile = latest.head_circumference_cm
+      ? calculateHeadCircumferencePercentile(latest.head_circumference_cm, ageMonths, genderForCalc)
+      : null;
 
     return {
       latest,
@@ -48,12 +131,16 @@ export const MeasurementsSummary = ({ measurements, birthdate }: MeasurementsSum
       heightChange,
       weightChange,
       headChange,
+      ageMonths,
       ageText: ageYears > 0 
         ? `${ageYears} yıl ${remainingMonths} ay`
         : `${ageMonths} ay`,
       measurementCount: measurements.length,
+      weightPercentile,
+      heightPercentile,
+      headPercentile,
     };
-  }, [measurements, birthdate]);
+  }, [measurements, birthdate, gender]);
 
   if (!summary) {
     return (
@@ -76,8 +163,10 @@ export const MeasurementsSummary = ({ measurements, birthdate }: MeasurementsSum
     return `${sign}${value.toFixed(1)} ${unit}`;
   };
 
+  const isWithinWHORange = summary.ageMonths <= 60;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Latest measurement date */}
       <div className="text-center pb-2 border-b border-border">
         <p className="text-sm text-muted-foreground">Son ölçüm</p>
@@ -137,6 +226,38 @@ export const MeasurementsSummary = ({ measurements, birthdate }: MeasurementsSum
           )}
         </div>
       </div>
+
+      {/* WHO Percentile Section */}
+      {isWithinWHORange && (summary.heightPercentile || summary.weightPercentile || summary.headPercentile) && (
+        <div className="space-y-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10">
+          <div className="flex items-center gap-2 pb-2 border-b border-border/50">
+            <Activity className="h-4 w-4 text-primary" />
+            <h4 className="text-sm font-semibold">WHO Persentil Karşılaştırması</h4>
+          </div>
+          
+          <div className="space-y-4">
+            {summary.heightPercentile && (
+              <PercentileIndicator result={summary.heightPercentile} label="Boy" />
+            )}
+            {summary.weightPercentile && (
+              <PercentileIndicator result={summary.weightPercentile} label="Kilo" />
+            )}
+            {summary.headPercentile && (
+              <PercentileIndicator result={summary.headPercentile} label="Baş Çevresi" />
+            )}
+          </div>
+
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            WHO Çocuk Gelişim Standartları (0-5 yaş)
+          </p>
+        </div>
+      )}
+
+      {!isWithinWHORange && (
+        <div className="text-center text-xs text-muted-foreground p-3 bg-muted/50 rounded-lg">
+          WHO persentil karşılaştırması 0-5 yaş arası için geçerlidir
+        </div>
+      )}
 
       {/* Total measurements count */}
       <div className="text-center text-sm text-muted-foreground">
