@@ -85,6 +85,53 @@ export type Database = {
         }
         Relationships: []
       }
+      measurements: {
+        Row: {
+          child_id: string
+          created_at: string
+          head_circumference_cm: number | null
+          height_cm: number | null
+          id: string
+          measurement_date: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          head_circumference_cm?: number | null
+          height_cm?: number | null
+          id?: string
+          measurement_date: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          head_circumference_cm?: number | null
+          height_cm?: number | null
+          id?: string
+          measurement_date?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "measurements_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milestones: {
         Row: {
           child_id: string
