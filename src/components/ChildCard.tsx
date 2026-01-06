@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, Sparkles, Calendar, Clock } from "lucide-react";
+import { Trash2, Sparkles, Calendar, Ruler } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
@@ -150,15 +150,25 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
         </div>
       )}
       
-      {/* Action Button */}
-      <Button 
-        variant="outline" 
-        className="w-full rounded-xl h-12 font-medium border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group/btn"
-        onClick={() => navigate(`/milestones/${id}`)}
-      >
-        <Sparkles className="mr-2 h-4 w-4 group-hover/btn:animate-pulse" />
-        Anıları Görüntüle
-      </Button>
+      {/* Action Buttons */}
+      <div className="flex gap-2">
+        <Button 
+          variant="outline" 
+          className="flex-1 rounded-xl h-12 font-medium border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group/btn"
+          onClick={() => navigate(`/milestones/${id}`)}
+        >
+          <Sparkles className="mr-2 h-4 w-4 group-hover/btn:animate-pulse" />
+          Anılar
+        </Button>
+        <Button 
+          variant="outline" 
+          className="flex-1 rounded-xl h-12 font-medium border-green-500/20 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300 group/btn"
+          onClick={() => navigate(`/measurements/${id}`)}
+        >
+          <Ruler className="mr-2 h-4 w-4" />
+          Ölçümler
+        </Button>
+      </div>
     </div>
   );
 };
