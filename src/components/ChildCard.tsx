@@ -182,28 +182,33 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
       
       {/* Latest Measurements */}
       {latestMeasurement && (latestMeasurement.height_cm || latestMeasurement.weight_kg || latestMeasurement.head_circumference_cm) && (
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {latestMeasurement.height_cm && (
-            <div className="text-center p-2 rounded-xl bg-primary/10 border border-primary/20">
-              <Ruler className="w-4 h-4 mx-auto text-primary mb-1" />
-              <div className="text-sm font-bold text-foreground">{latestMeasurement.height_cm}</div>
-              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">cm</div>
-            </div>
-          )}
-          {latestMeasurement.weight_kg && (
-            <div className="text-center p-2 rounded-xl bg-green-500/10 border border-green-500/20">
-              <Scale className="w-4 h-4 mx-auto text-green-600 mb-1" />
-              <div className="text-sm font-bold text-foreground">{latestMeasurement.weight_kg}</div>
-              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">kg</div>
-            </div>
-          )}
-          {latestMeasurement.head_circumference_cm && (
-            <div className="text-center p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <Circle className="w-4 h-4 mx-auto text-purple-600 mb-1" />
-              <div className="text-sm font-bold text-foreground">{latestMeasurement.head_circumference_cm}</div>
-              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">cm</div>
-            </div>
-          )}
+        <div className="mb-6">
+          <div className="text-xs text-muted-foreground text-center mb-2">
+            Son ölçüm: {new Date(latestMeasurement.measurement_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {latestMeasurement.height_cm && (
+              <div className="text-center p-2 rounded-xl bg-primary/10 border border-primary/20">
+                <Ruler className="w-4 h-4 mx-auto text-primary mb-1" />
+                <div className="text-sm font-bold text-foreground">{latestMeasurement.height_cm}</div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">cm</div>
+              </div>
+            )}
+            {latestMeasurement.weight_kg && (
+              <div className="text-center p-2 rounded-xl bg-green-500/10 border border-green-500/20">
+                <Scale className="w-4 h-4 mx-auto text-green-600 mb-1" />
+                <div className="text-sm font-bold text-foreground">{latestMeasurement.weight_kg}</div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">kg</div>
+              </div>
+            )}
+            {latestMeasurement.head_circumference_cm && (
+              <div className="text-center p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                <Circle className="w-4 h-4 mx-auto text-purple-600 mb-1" />
+                <div className="text-sm font-bold text-foreground">{latestMeasurement.head_circumference_cm}</div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">cm</div>
+              </div>
+            )}
+          </div>
         </div>
       )}
       
