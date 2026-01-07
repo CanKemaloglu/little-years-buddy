@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, Sparkles, Calendar, Ruler } from "lucide-react";
+import { Trash2, Sparkles, Calendar, Ruler, Scale, Circle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
@@ -8,6 +8,13 @@ import { ShareChildDialog } from "./ShareChildDialog";
 import { getZodiacSign } from "@/lib/zodiacUtils";
 import { getAnimalById } from "@/lib/animalCharacters";
 import { supabase } from "@/integrations/supabase/client";
+
+interface Measurement {
+  height_cm: number | null;
+  weight_kg: number | null;
+  head_circumference_cm: number | null;
+  measurement_date: string;
+}
 
 interface ChildCardProps {
   id: string;
@@ -28,12 +35,27 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
   const zodiacSign = getZodiacSign(birthdate);
   const animalChar = getAnimalById(animal);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [latestMeasurement, setLatestMeasurement] = useState<Measurement | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setCurrentUser(user?.id || null);
     });
-  }, []);
+    
+    // Fetch latest measurement
+    supabase
+      .from('measurements')
+      .select('height_cm, weight_kg, head_circumference_cm, measurement_date')
+      .eq('child_id', id)
+      .order('measurement_date', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setLatestMeasurement(data);
+        }
+      });
+  }, [id]);
 
   const getPrimaryDisplay = () => {
     if (age.years >= 1) {
@@ -145,6 +167,33 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/40 rounded-full text-xs">
               <span>👩</span>
               <span className="text-muted-foreground">{motherName}</span>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Latest Measurements */}
+      {latestMeasurement && (latestMeasurement.height_cm || latestMeasurement.weight_kg || latestMeasurement.head_circumference_cm) && (
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          {latestMeasurement.height_cm && (
+            <div className="text-center p-2 rounded-xl bg-primary/10 border border-primary/20">
+              <Ruler className="w-4 h-4 mx-auto text-primary mb-1" />
+              <div className="text-sm font-bold text-foreground">{latestMeasurement.height_cm}</div>
+              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">cm</div>
+            </div>
+          )}
+          {latestMeasurement.weight_kg && (
+            <div className="text-center p-2 rounded-xl bg-green-500/10 border border-green-500/20">
+              <Scale className="w-4 h-4 mx-auto text-green-600 mb-1" />
+              <div className="text-sm font-bold text-foreground">{latestMeasurement.weight_kg}</div>
+              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">kg</div>
+            </div>
+          )}
+          {latestMeasurement.head_circumference_cm && (
+            <div className="text-center p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
+              <Circle className="w-4 h-4 mx-auto text-purple-600 mb-1" />
+              <div className="text-sm font-bold text-foreground">{latestMeasurement.head_circumference_cm}</div>
+              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">cm</div>
             </div>
           )}
         </div>
