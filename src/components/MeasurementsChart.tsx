@@ -31,18 +31,18 @@ interface MeasurementsChartProps {
 export const MeasurementsChart = ({ measurements, birthdate, gender = 'neutral' }: MeasurementsChartProps) => {
   const genderForCalc: Gender = gender === 'male' ? 'male' : gender === 'female' ? 'female' : 'male';
   
-  // Calculate max age for percentile curves
+  // Calculate max age for percentile curves - start from 0
   const maxAgeMonths = useMemo(() => {
     if (!birthdate || measurements.length === 0) return 24;
     const maxDate = Math.max(...measurements.map(m => new Date(m.measurement_date).getTime()));
     const ageInDays = differenceInDays(new Date(maxDate), new Date(birthdate));
-    return Math.min(Math.ceil(ageInDays / 30.44) + 6, 60);
+    return Math.min(Math.ceil(ageInDays / 30.44) + 3, 60);
   }, [measurements, birthdate]);
 
-  // Generate percentile curves
-  const heightCurves = useMemo(() => generatePercentileCurves('height', genderForCalc, maxAgeMonths), [genderForCalc, maxAgeMonths]);
-  const weightCurves = useMemo(() => generatePercentileCurves('weight', genderForCalc, maxAgeMonths), [genderForCalc, maxAgeMonths]);
-  const headCurves = useMemo(() => generatePercentileCurves('headCircumference', genderForCalc, maxAgeMonths), [genderForCalc, maxAgeMonths]);
+  // Generate percentile curves starting from 0
+  const heightCurves = useMemo(() => generatePercentileCurves('height', genderForCalc, maxAgeMonths, 0), [genderForCalc, maxAgeMonths]);
+  const weightCurves = useMemo(() => generatePercentileCurves('weight', genderForCalc, maxAgeMonths, 0), [genderForCalc, maxAgeMonths]);
+  const headCurves = useMemo(() => generatePercentileCurves('headCircumference', genderForCalc, maxAgeMonths, 0), [genderForCalc, maxAgeMonths]);
 
   const chartData = useMemo(() => {
     if (!birthdate) return [];
@@ -93,33 +93,32 @@ export const MeasurementsChart = ({ measurements, birthdate, gender = 'neutral' 
     return null;
   };
 
-  // Merge chart data with percentile curves
+  // Merge chart data with percentile curves - keeping both curves and measurements in same array
   const mergeWithCurves = (curves: typeof heightCurves, dataKey: 'boy' | 'kilo' | 'basCevresi') => {
-    const curveMap = new Map(curves.map(c => [c.ageMonths, c]));
     const result: any[] = [];
     
-    // Add curve points
+    // Add all curve points first
     curves.forEach(c => {
       result.push({
         ageMonths: c.ageMonths,
-        ageLabel: `${c.ageMonths} ay`,
         p3: c.p3,
         p15: c.p15,
         p50: c.p50,
         p85: c.p85,
         p97: c.p97,
+        [dataKey]: null, // Measurement will be added if exists at this age
       });
     });
     
-    // Add measurement points
+    // Add measurement points, merging with existing curve points or adding new ones
     chartData.forEach(d => {
       const existingIdx = result.findIndex(r => Math.abs(r.ageMonths - d.ageMonths) < 0.5);
       if (existingIdx >= 0) {
         result[existingIdx][dataKey] = d[dataKey];
       } else {
+        // Add new point with only measurement data
         result.push({
           ageMonths: d.ageMonths,
-          ageLabel: d.ageLabel,
           [dataKey]: d[dataKey],
         });
       }
@@ -131,6 +130,8 @@ export const MeasurementsChart = ({ measurements, birthdate, gender = 'neutral' 
   const heightData = mergeWithCurves(heightCurves, 'boy');
   const weightData = mergeWithCurves(weightCurves, 'kilo');
   const headData = mergeWithCurves(headCurves, 'basCevresi');
+
+  const formatXAxisTick = (value: number) => `${value} ay`;
 
   return (
     <div className="space-y-6">
@@ -145,10 +146,12 @@ export const MeasurementsChart = ({ measurements, birthdate, gender = 'neutral' 
             <ComposedChart data={heightData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
-                dataKey="ageLabel" 
+                dataKey="ageMonths" 
+                type="number"
+                domain={[0, 'dataMax']}
                 tick={{ fontSize: 10 }} 
+                tickFormatter={formatXAxisTick}
                 className="text-muted-foreground"
-                interval="preserveStartEnd"
               />
               <YAxis 
                 tick={{ fontSize: 10 }} 
@@ -196,10 +199,12 @@ export const MeasurementsChart = ({ measurements, birthdate, gender = 'neutral' 
             <ComposedChart data={weightData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
-                dataKey="ageLabel" 
+                dataKey="ageMonths" 
+                type="number"
+                domain={[0, 'dataMax']}
                 tick={{ fontSize: 10 }} 
+                tickFormatter={formatXAxisTick}
                 className="text-muted-foreground"
-                interval="preserveStartEnd"
               />
               <YAxis 
                 tick={{ fontSize: 10 }} 
@@ -245,10 +250,12 @@ export const MeasurementsChart = ({ measurements, birthdate, gender = 'neutral' 
             <ComposedChart data={headData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
-                dataKey="ageLabel" 
+                dataKey="ageMonths" 
+                type="number"
+                domain={[0, 'dataMax']}
                 tick={{ fontSize: 10 }} 
+                tickFormatter={formatXAxisTick}
                 className="text-muted-foreground"
-                interval="preserveStartEnd"
               />
               <YAxis 
                 tick={{ fontSize: 10 }} 
