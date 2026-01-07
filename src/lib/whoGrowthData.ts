@@ -328,7 +328,8 @@ export function calculateHeadCircumferencePercentile(
 export function generatePercentileCurves(
   type: 'weight' | 'height' | 'headCircumference',
   gender: Gender,
-  maxAgeMonths: number = 60
+  maxAgeMonths: number = 60,
+  minAgeMonths: number = 0
 ): { ageMonths: number; p3: number; p15: number; p50: number; p85: number; p97: number }[] {
   const isMale = gender === 'male';
   let data: LMSData[];
@@ -354,7 +355,8 @@ export function generatePercentileCurves(
   const z85 = 1.04;
   const z97 = 1.88;
   
-  for (let age = 0; age <= Math.min(maxAgeMonths, 60); age += 3) {
+  // Start from minAgeMonths (default 0) with smaller intervals for smoother curves
+  for (let age = minAgeMonths; age <= Math.min(maxAgeMonths, 60); age += 1) {
     const lms = interpolateLMS(data, age);
     
     const calculateValue = (z: number) => {
