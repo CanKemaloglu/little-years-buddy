@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, Sparkles, Calendar, Ruler, Scale, Circle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { differenceInMonths, differenceInDays, addMonths } from "date-fns";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
 import { ShareChildDialog } from "./ShareChildDialog";
@@ -57,19 +58,31 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
       });
   }, [id]);
 
-  const getPrimaryDisplay = () => {
-    if (age.years >= 1) {
-      return { value: age.years, unit: age.years === 1 ? "year" : "years" };
-    } else if (age.months >= 1) {
-      return { value: age.months, unit: age.months === 1 ? "month" : "months" };
+  const getDetailedAge = () => {
+    const birth = new Date(birthdate);
+    const today = new Date();
+    const totalMonths = differenceInMonths(today, birth);
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+    const dateAfterMonths = addMonths(birth, totalMonths);
+    const days = differenceInDays(today, dateAfterMonths);
+
+    if (years >= 1) {
+      if (months > 0) {
+        return `${years} yıl ${months} ay ${days} günlük`;
+      }
+      return `${years} yıl ${days} günlük`;
+    } else if (totalMonths >= 1) {
+      return `${totalMonths} ay ${days} günlük`;
     } else if (age.weeks >= 1) {
-      return { value: age.weeks, unit: age.weeks === 1 ? "week" : "weeks" };
+      const remainingDays = age.days % 7;
+      return `${age.weeks} hafta ${remainingDays} günlük`;
     } else {
-      return { value: age.days, unit: age.days === 1 ? "day" : "days" };
+      return `${age.days} günlük`;
     }
   };
 
-  const primary = getPrimaryDisplay();
+  const detailedAge = getDetailedAge();
 
   return (
     <div 
@@ -124,15 +137,10 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
 
       {/* Age Display */}
       <div className="relative mb-6">
-        <div className="text-center py-8 px-4 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 border border-primary/10">
-          <div className="flex items-baseline justify-center gap-2">
-            <span className="text-6xl font-black text-primary tracking-tighter">
-              {primary.value}
-            </span>
-            <span className="text-xl font-medium text-primary/70">
-              {primary.unit}
-            </span>
-          </div>
+        <div className="text-center py-6 px-4 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 border border-primary/10">
+          <span className="text-2xl font-bold text-primary tracking-tight">
+            {detailedAge}
+          </span>
         </div>
       </div>
       
