@@ -138,6 +138,9 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
       {/* Age Display */}
       <div className="relative mb-6">
         <div className="text-center py-6 px-4 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 border border-primary/10">
+          <div className="text-xs text-muted-foreground mb-2">
+            {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
           <span className="text-2xl font-bold text-primary tracking-tight">
             {detailedAge}
           </span>
