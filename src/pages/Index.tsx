@@ -120,6 +120,7 @@ const Index = () => {
             <h1 className="text-2xl font-bold">Little Tracker</h1>
           </div>
           <div className="flex items-center gap-2">
+            <AddChildDialog onChildAdded={fetchChildren} />
             <AIChatDialog />
             <Button variant="ghost" size="icon" onClick={handleSignOut}>
               <LogOut className="h-5 w-5" />
@@ -129,14 +130,11 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">Your Children</h2>
-            <p className="text-muted-foreground">
-              Track and celebrate every milestone
-            </p>
-          </div>
-          <AddChildDialog onChildAdded={fetchChildren} />
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold mb-2">Your Children</h2>
+          <p className="text-muted-foreground">
+            Track and celebrate every milestone
+          </p>
         </div>
 
         {children.length === 0 ? (
@@ -148,7 +146,6 @@ const Index = () => {
             <p className="text-muted-foreground mb-6">
               Add your first child to start tracking their growth
             </p>
-            <AddChildDialog onChildAdded={fetchChildren} />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
