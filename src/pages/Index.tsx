@@ -113,12 +113,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-warm" data-theme="neutral">
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <Baby className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <h1 className="text-2xl font-bold">Little Tracker</h1>
-          </div>
+          <h1 className="text-2xl font-bold">Little Tracker</h1>
           <div className="flex items-center gap-2">
             <AddChildDialog onChildAdded={fetchChildren} />
             <AIChatDialog />
