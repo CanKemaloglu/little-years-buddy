@@ -126,6 +126,17 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
               <Calendar className="w-3 h-3" />
               {new Date(birthdate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
+            {/* Birthday Countdown */}
+            <div className="flex items-center gap-1.5 mt-1">
+              <Cake className="w-3 h-3 text-pink-500 animate-bounce" />
+              <span className="text-xs text-muted-foreground">
+                {daysUntilBirthday === 0 ? (
+                  <span className="text-pink-500 font-bold">🎉 Bugün!</span>
+                ) : (
+                  <><span className="text-pink-500 font-bold">{daysUntilBirthday}</span> gün</>
+                )}
+              </span>
+            </div>
           </div>
         </div>
         
@@ -161,27 +172,6 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
           <span className="text-2xl font-bold text-primary tracking-tight">
             {detailedAge}
           </span>
-          
-          {/* Birthday Countdown */}
-          <div className="mt-4 pt-4 border-t border-primary/10">
-            <div className="flex items-center justify-center gap-2">
-              <div className="relative">
-                <Cake className="w-5 h-5 text-pink-500 animate-bounce" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
-              </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                {daysUntilBirthday === 0 ? (
-                  <span className="text-pink-500 font-bold">🎉 Bugün doğum günü! 🎉</span>
-                ) : (
-                  <>Doğum gününe <span className="text-pink-500 font-bold">{daysUntilBirthday}</span> gün</>
-                )}
-              </span>
-              <div className="relative">
-                <Cake className="w-5 h-5 text-pink-500 animate-bounce" style={{ animationDelay: '0.1s' }} />
-                <div className="absolute -top-1 -left-1 w-2 h-2 bg-orange-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }} />
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       
