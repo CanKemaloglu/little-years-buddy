@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, Sparkles, Calendar, Ruler, Scale, Circle } from "lucide-react";
+import { Trash2, Sparkles, Calendar, Ruler, Scale, Circle, Cake } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { differenceInMonths, differenceInDays, addMonths } from "date-fns";
+import { differenceInMonths, differenceInDays, addMonths, differenceInCalendarDays } from "date-fns";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditChildDialog } from "./EditChildDialog";
 import { ShareChildDialog } from "./ShareChildDialog";
@@ -82,6 +82,23 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
     }
   };
 
+  const getDaysUntilBirthday = () => {
+    const today = new Date();
+    const birth = new Date(birthdate);
+    
+    // Next birthday this year
+    let nextBirthday = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+    
+    // If birthday has passed this year, get next year's birthday
+    if (nextBirthday < today) {
+      nextBirthday = new Date(today.getFullYear() + 1, birth.getMonth(), birth.getDate());
+    }
+    
+    return differenceInCalendarDays(nextBirthday, today);
+  };
+
+  const daysUntilBirthday = getDaysUntilBirthday();
+
   const detailedAge = getDetailedAge();
 
   return (
@@ -144,6 +161,27 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
           <span className="text-2xl font-bold text-primary tracking-tight">
             {detailedAge}
           </span>
+          
+          {/* Birthday Countdown */}
+          <div className="mt-4 pt-4 border-t border-primary/10">
+            <div className="flex items-center justify-center gap-2">
+              <div className="relative">
+                <Cake className="w-5 h-5 text-pink-500 animate-bounce" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">
+                {daysUntilBirthday === 0 ? (
+                  <span className="text-pink-500 font-bold">🎉 Bugün doğum günü! 🎉</span>
+                ) : (
+                  <>Doğum gününe <span className="text-pink-500 font-bold">{daysUntilBirthday}</span> gün</>
+                )}
+              </span>
+              <div className="relative">
+                <Cake className="w-5 h-5 text-pink-500 animate-bounce" style={{ animationDelay: '0.1s' }} />
+                <div className="absolute -top-1 -left-1 w-2 h-2 bg-orange-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
