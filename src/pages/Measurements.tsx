@@ -203,7 +203,7 @@ const Measurements = () => {
                         <TableRow>
                           <TableHead>Tarih</TableHead>
                           <TableHead className="text-right">Boy (cm)</TableHead>
-                          <TableHead className="text-right">Kilo (kg)</TableHead>
+                          <TableHead className="text-right">Kilo</TableHead>
                           <TableHead className="text-right">Baş Ç. (cm)</TableHead>
                           <TableHead className="text-right">İşlem</TableHead>
                         </TableRow>
@@ -218,7 +218,12 @@ const Measurements = () => {
                               {m.height_cm ?? "-"}
                             </TableCell>
                             <TableCell className="text-right">
-                              {m.weight_kg ?? "-"}
+                              {m.weight_kg ? (
+                                <div className="flex flex-col items-end">
+                                  <span className="font-medium">{m.weight_kg} kg</span>
+                                  <span className="text-xs text-muted-foreground">{Math.round(m.weight_kg * 1000)} g</span>
+                                </div>
+                              ) : "-"}
                             </TableCell>
                             <TableCell className="text-right">
                               {m.head_circumference_cm ?? "-"}
