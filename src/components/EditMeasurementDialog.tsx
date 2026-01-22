@@ -108,14 +108,14 @@ export const EditMeasurementDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Ruler className="h-5 w-5" />
             Ölçümü Düzenle
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="editMeasurementDate">Tarih</Label>
             <Input
@@ -127,23 +127,39 @@ export const EditMeasurementDialog = ({
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="editHeight">Boy (cm)</Label>
-              <Input
-                id="editHeight"
-                type="number"
-                step="0.1"
-                min="0"
-                max="250"
-                value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value)}
-                placeholder="75.5"
-              />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editHeight">Boy (cm)</Label>
+                <Input
+                  id="editHeight"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="250"
+                  value={heightCm}
+                  onChange={(e) => setHeightCm(e.target.value)}
+                  placeholder="75.5"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editHead">Baş Çevresi (cm)</Label>
+                <Input
+                  id="editHead"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  value={headCircumferenceCm}
+                  onChange={(e) => setHeadCircumferenceCm(e.target.value)}
+                  placeholder="42.0"
+                />
+              </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="editWeight">Kilo</Label>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Input
                   id="editWeight"
                   type="number"
@@ -156,28 +172,23 @@ export const EditMeasurementDialog = ({
                   className="flex-1"
                 />
                 <Select value={weightUnit} onValueChange={(v: "kg" | "g") => setWeightUnit(v)}>
-                  <SelectTrigger className="w-16">
+                  <SelectTrigger className="w-20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="kg">kg</SelectItem>
-                    <SelectItem value="g">g</SelectItem>
+                    <SelectItem value="g">gram</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="editHead">Baş Çevresi (cm)</Label>
-              <Input
-                id="editHead"
-                type="number"
-                step="0.1"
-                min="0"
-                max="100"
-                value={headCircumferenceCm}
-                onChange={(e) => setHeadCircumferenceCm(e.target.value)}
-                placeholder="42.0"
-              />
+              {weightValue && (
+                <p className="text-xs text-muted-foreground">
+                  {weightUnit === "kg" 
+                    ? `= ${Math.round(parseFloat(weightValue) * 1000)} gram`
+                    : `= ${(parseFloat(weightValue) / 1000).toFixed(2)} kg`
+                  }
+                </p>
+              )}
             </div>
           </div>
 
