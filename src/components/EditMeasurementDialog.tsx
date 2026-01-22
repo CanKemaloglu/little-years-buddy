@@ -9,6 +9,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Ruler } from "lucide-react";
@@ -38,7 +45,8 @@ export const EditMeasurementDialog = ({
   const [loading, setLoading] = useState(false);
   const [measurementDate, setMeasurementDate] = useState("");
   const [heightCm, setHeightCm] = useState("");
-  const [weightKg, setWeightKg] = useState("");
+  const [weightValue, setWeightValue] = useState("");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "g">("kg");
   const [headCircumferenceCm, setHeadCircumferenceCm] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -46,7 +54,9 @@ export const EditMeasurementDialog = ({
     if (measurement) {
       setMeasurementDate(measurement.measurement_date);
       setHeightCm(measurement.height_cm?.toString() || "");
-      setWeightKg(measurement.weight_kg?.toString() || "");
+      // Default to kg when loading existing data
+      setWeightValue(measurement.weight_kg?.toString() || "");
+      setWeightUnit("kg");
       setHeadCircumferenceCm(measurement.head_circumference_cm?.toString() || "");
       setNotes(measurement.notes || "");
     }
@@ -57,7 +67,7 @@ export const EditMeasurementDialog = ({
 
     if (!measurement) return;
 
-    if (!heightCm && !weightKg && !headCircumferenceCm) {
+    if (!heightCm && !weightValue && !headCircumferenceCm) {
       toast.error("En az bir ölçüm girin");
       return;
     }
@@ -65,12 +75,19 @@ export const EditMeasurementDialog = ({
     setLoading(true);
 
     try {
+      // Convert weight to kg if entered in grams
+      let weightKg: number | null = null;
+      if (weightValue) {
+        const numValue = parseFloat(weightValue);
+        weightKg = weightUnit === "g" ? numValue / 1000 : numValue;
+      }
+
       const { error } = await supabase
         .from("measurements")
         .update({
           measurement_date: measurementDate,
           height_cm: heightCm ? parseFloat(heightCm) : null,
-          weight_kg: weightKg ? parseFloat(weightKg) : null,
+          weight_kg: weightKg,
           head_circumference_cm: headCircumferenceCm ? parseFloat(headCircumferenceCm) : null,
           notes: notes || null,
         })
@@ -125,17 +142,29 @@ export const EditMeasurementDialog = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="editWeight">Kilo (kg)</Label>
-              <Input
-                id="editWeight"
-                type="number"
-                step="0.1"
-                min="0"
-                max="200"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
-                placeholder="9.2"
-              />
+              <Label htmlFor="editWeight">Kilo</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="editWeight"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max={weightUnit === "kg" ? "200" : "200000"}
+                  value={weightValue}
+                  onChange={(e) => setWeightValue(e.target.value)}
+                  placeholder={weightUnit === "kg" ? "9.2" : "9200"}
+                  className="flex-1"
+                />
+                <Select value={weightUnit} onValueChange={(v: "kg" | "g") => setWeightUnit(v)}>
+                  <SelectTrigger className="w-16">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="kg">kg</SelectItem>
+                    <SelectItem value="g">g</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="editHead">Baş Çevresi (cm)</Label>

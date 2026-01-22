@@ -10,6 +10,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Ruler, Plus } from "lucide-react";
@@ -24,14 +31,15 @@ export const AddMeasurementDialog = ({ childId, onMeasurementAdded }: AddMeasure
   const [loading, setLoading] = useState(false);
   const [measurementDate, setMeasurementDate] = useState(new Date().toISOString().split('T')[0]);
   const [heightCm, setHeightCm] = useState("");
-  const [weightKg, setWeightKg] = useState("");
+  const [weightValue, setWeightValue] = useState("");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "g">("kg");
   const [headCircumferenceCm, setHeadCircumferenceCm] = useState("");
   const [notes, setNotes] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!heightCm && !weightKg && !headCircumferenceCm) {
+    if (!heightCm && !weightValue && !headCircumferenceCm) {
       toast.error("En az bir ölçüm girin");
       return;
     }
@@ -42,12 +50,19 @@ export const AddMeasurementDialog = ({ childId, onMeasurementAdded }: AddMeasure
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Kullanıcı bulunamadı");
 
+      // Convert weight to kg if entered in grams
+      let weightKg: number | null = null;
+      if (weightValue) {
+        const numValue = parseFloat(weightValue);
+        weightKg = weightUnit === "g" ? numValue / 1000 : numValue;
+      }
+
       const { error } = await supabase.from("measurements").insert({
         child_id: childId,
         user_id: user.id,
         measurement_date: measurementDate,
         height_cm: heightCm ? parseFloat(heightCm) : null,
-        weight_kg: weightKg ? parseFloat(weightKg) : null,
+        weight_kg: weightKg,
         head_circumference_cm: headCircumferenceCm ? parseFloat(headCircumferenceCm) : null,
         notes: notes || null,
       });
@@ -69,7 +84,8 @@ export const AddMeasurementDialog = ({ childId, onMeasurementAdded }: AddMeasure
   const resetForm = () => {
     setMeasurementDate(new Date().toISOString().split('T')[0]);
     setHeightCm("");
-    setWeightKg("");
+    setWeightValue("");
+    setWeightUnit("kg");
     setHeadCircumferenceCm("");
     setNotes("");
   };
@@ -116,17 +132,29 @@ export const AddMeasurementDialog = ({ childId, onMeasurementAdded }: AddMeasure
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="weight">Kilo (kg)</Label>
-              <Input
-                id="weight"
-                type="number"
-                step="0.1"
-                min="0"
-                max="200"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
-                placeholder="9.2"
-              />
+              <Label htmlFor="weight">Kilo</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="weight"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max={weightUnit === "kg" ? "200" : "200000"}
+                  value={weightValue}
+                  onChange={(e) => setWeightValue(e.target.value)}
+                  placeholder={weightUnit === "kg" ? "9.2" : "9200"}
+                  className="flex-1"
+                />
+                <Select value={weightUnit} onValueChange={(v: "kg" | "g") => setWeightUnit(v)}>
+                  <SelectTrigger className="w-16">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="kg">kg</SelectItem>
+                    <SelectItem value="g">g</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="head">Baş Çevresi (cm)</Label>
