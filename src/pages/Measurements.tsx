@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Ruler, BarChart3, List, Trash2 } from "lucide-react";
+import { ArrowLeft, Ruler, BarChart3, List, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { AddMeasurementDialog } from "@/components/AddMeasurementDialog";
+import { EditMeasurementDialog } from "@/components/EditMeasurementDialog";
 import { MeasurementsChart } from "@/components/MeasurementsChart";
 import { MeasurementsSummary } from "@/components/MeasurementsSummary";
 import {
@@ -54,6 +55,8 @@ const Measurements = () => {
   const [child, setChild] = useState<Child | null>(null);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingMeasurement, setEditingMeasurement] = useState<Measurement | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchData = async () => {
     if (!childId) return;
@@ -221,30 +224,43 @@ const Measurements = () => {
                               {m.head_circumference_cm ?? "-"}
                             </TableCell>
                             <TableCell className="text-right">
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Ölçümü Sil</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Bu ölçümü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>İptal</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleDeleteMeasurement(m.id)}
-                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    >
-                                      Sil
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setEditingMeasurement(m);
+                                    setEditDialogOpen(true);
+                                  }}
+                                >
+                                  <Pencil className="h-4 w-4 text-muted-foreground" />
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <Trash2 className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Ölçümü Sil</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Bu ölçümü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>İptal</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeleteMeasurement(m.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Sil
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -256,6 +272,13 @@ const Measurements = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <EditMeasurementDialog
+          measurement={editingMeasurement}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onMeasurementUpdated={fetchData}
+        />
       </main>
     </div>
   );
