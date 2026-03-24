@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Baby } from "lucide-react";
+import { Baby, Eye, EyeOff } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
