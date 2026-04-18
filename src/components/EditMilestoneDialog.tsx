@@ -35,14 +35,22 @@ export const EditMilestoneDialog = ({
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setPhoto(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Sadece JPEG, PNG, GIF veya WebP yükleyebilirsiniz");
+      return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Fotoğraf 5MB'dan küçük olmalı");
+      return;
+    }
+    setPhoto(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRemovePhoto = () => {
@@ -66,24 +74,28 @@ export const EditMilestoneDialog = ({
     setLoading(true);
 
     try {
-      let photoUrl = initialPhotoUrl;
+      let photoUrl: string | null | undefined = initialPhotoUrl;
 
       if (photo) {
-        const fileExt = photo.name.split(".").pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${fileName}`;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Giriş yapmalısınız");
+
+        const extMap: Record<string, string> = {
+          "image/jpeg": "jpg",
+          "image/png": "png",
+          "image/gif": "gif",
+          "image/webp": "webp",
+        };
+        const safeExt = extMap[photo.type] ?? "jpg";
+        const filePath = `${user.id}/${id}/${Date.now()}.${safeExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from("milestone-photos")
-          .upload(filePath, photo);
+          .upload(filePath, photo, { contentType: photo.type });
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from("milestone-photos")
-          .getPublicUrl(filePath);
-
-        photoUrl = publicUrl;
+        photoUrl = filePath;
       } else if (!photoPreview) {
         photoUrl = null;
       }

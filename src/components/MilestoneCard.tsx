@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Calendar } from "lucide-react";
 import { calculateAge } from "@/lib/ageCalculations";
 import { EditMilestoneDialog } from "./EditMilestoneDialog";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MilestoneCardProps {
   id: string;
@@ -27,6 +29,29 @@ export const MilestoneCard = ({
 }: MilestoneCardProps) => {
   const age = calculateAge(childBirthdate, new Date(milestoneDate));
   const formattedDate = new Date(milestoneDate).toLocaleDateString();
+  const [resolvedPhotoUrl, setResolvedPhotoUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function resolve() {
+      if (!photoUrl) {
+        setResolvedPhotoUrl(undefined);
+        return;
+      }
+      if (/^https?:\/\//i.test(photoUrl)) {
+        setResolvedPhotoUrl(photoUrl);
+        return;
+      }
+      const { data } = await supabase.storage
+        .from("milestone-photos")
+        .createSignedUrl(photoUrl, 3600);
+      if (!cancelled) setResolvedPhotoUrl(data?.signedUrl);
+    }
+    resolve();
+    return () => {
+      cancelled = true;
+    };
+  }, [photoUrl]);
 
   return (
     <Card className="overflow-hidden shadow-soft hover:shadow-lg transition-shadow">
@@ -52,10 +77,10 @@ export const MilestoneCard = ({
         </div>
       </CardHeader>
       <CardContent>
-        {photoUrl && (
+        {resolvedPhotoUrl && (
           <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
             <img
-              src={photoUrl}
+              src={resolvedPhotoUrl}
               alt={title}
               className="w-full h-full object-cover"
             />
