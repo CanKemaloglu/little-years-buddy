@@ -18,33 +18,36 @@ export type Database = {
         Row: {
           child_id: string
           created_at: string
-          first_tried_date: string
+          first_tried_date: string | null
           food_id: string
           id: string
           notes: string | null
           reaction: Database["public"]["Enums"]["food_reaction"]
+          try_count: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           child_id: string
           created_at?: string
-          first_tried_date?: string
+          first_tried_date?: string | null
           food_id: string
           id?: string
           notes?: string | null
           reaction?: Database["public"]["Enums"]["food_reaction"]
+          try_count?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           child_id?: string
           created_at?: string
-          first_tried_date?: string
+          first_tried_date?: string | null
           food_id?: string
           id?: string
           notes?: string | null
           reaction?: Database["public"]["Enums"]["food_reaction"]
+          try_count?: number | null
           updated_at?: string
           user_id?: string
         }
