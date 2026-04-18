@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      child_foods: {
+        Row: {
+          child_id: string
+          created_at: string
+          first_tried_date: string
+          food_id: string
+          id: string
+          notes: string | null
+          reaction: Database["public"]["Enums"]["food_reaction"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          first_tried_date?: string
+          food_id: string
+          id?: string
+          notes?: string | null
+          reaction?: Database["public"]["Enums"]["food_reaction"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          first_tried_date?: string
+          food_id?: string
+          id?: string
+          notes?: string | null
+          reaction?: Database["public"]["Enums"]["food_reaction"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_foods_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_foods_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       child_shares: {
         Row: {
           child_id: string
@@ -84,6 +135,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      food_categories: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      foods: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "foods_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "food_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       measurements: {
         Row: {
@@ -191,6 +304,7 @@ export type Database = {
       }
     }
     Enums: {
+      food_reaction: "loved" | "liked" | "neutral" | "disliked" | "allergic"
       parent_role: "father" | "mother"
     }
     CompositeTypes: {
@@ -319,6 +433,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      food_reaction: ["loved", "liked", "neutral", "disliked", "allergic"],
       parent_role: ["father", "mother"],
     },
   },
