@@ -12,7 +12,7 @@ import { toast } from "sonner";
 interface Category { id: string; name: string; icon: string; sort_order: number; }
 interface Food { id: string; name: string; category_id: string; }
 
-type Filter = 'all' | 'tried' | 'loved' | 'allergic';
+type Filter = 'all' | 'tried' | 'loved' | 'liked' | 'neutral' | 'disliked' | 'allergic';
 
 const Foods = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -61,10 +61,15 @@ const Foods = () => {
     const cf = childFoodMap.get(foodId);
     if (filter === 'all') return true;
     if (filter === 'tried') return !!cf;
-    if (filter === 'loved') return cf?.reaction === 'loved';
-    if (filter === 'allergic') return cf?.reaction === 'allergic';
-    return true;
+    return cf?.reaction === filter;
   };
+
+  // When a filter other than 'all' is active, show a single flat list across all categories
+  const showFlatList = filter !== 'all';
+  const flatFoods = useMemo(
+    () => foods.filter(f => filterFood(f.id)),
+    [foods, filter, childFoodMap]
+  );
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="text-muted-foreground">Yükleniyor...</div></div>;
@@ -109,8 +114,11 @@ const Foods = () => {
           {([
             { v: 'all', l: 'Tümü' },
             { v: 'tried', l: 'Denenenler' },
-            { v: 'loved', l: 'Bayıldıkları 😍' },
-            { v: 'allergic', l: 'Alerjiler ⚠️' },
+            { v: 'loved', l: 'Bayıldı 😍' },
+            { v: 'liked', l: 'Beğendi 🙂' },
+            { v: 'neutral', l: 'Kararsız 😐' },
+            { v: 'disliked', l: 'Sevmedi 😕' },
+            { v: 'allergic', l: 'Alerji ⚠️' },
           ] as { v: Filter; l: string }[]).map(f => (
             <Button
               key={f.v}
@@ -124,42 +132,64 @@ const Foods = () => {
           ))}
         </div>
 
-        {/* Categories */}
-        <Tabs value={activeCat} onValueChange={setActiveCat}>
-          <TabsList className="w-full overflow-x-auto justify-start h-auto flex-wrap p-1">
-            {categories.map(c => (
-              <TabsTrigger key={c.id} value={c.id} className="flex-shrink-0">
-                {c.icon} {c.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        {showFlatList ? (
+          /* Flat list across all categories when a reaction filter is active */
+          flatFoods.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground text-sm">
+              Bu filtreye uyan gıda yok
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {flatFoods.map(f => (
+                <FoodCard
+                  key={f.id}
+                  foodId={f.id}
+                  foodName={f.name}
+                  childId={childId!}
+                  existing={childFoodMap.get(f.id)}
+                  onChange={loadAll}
+                />
+              ))}
+            </div>
+          )
+        ) : (
+          /* Categorized view when showing all foods */
+          <Tabs value={activeCat} onValueChange={setActiveCat}>
+            <TabsList className="w-full overflow-x-auto justify-start h-auto flex-wrap p-1">
+              {categories.map(c => (
+                <TabsTrigger key={c.id} value={c.id} className="flex-shrink-0">
+                  {c.icon} {c.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
-          {categories.map(c => {
-            const catFoods = foods.filter(f => f.category_id === c.id && filterFood(f.id));
-            return (
-              <TabsContent key={c.id} value={c.id} className="mt-4">
-                {catFoods.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground text-sm">
-                    Bu kategoride gıda yok
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {catFoods.map(f => (
-                      <FoodCard
-                        key={f.id}
-                        foodId={f.id}
-                        foodName={f.name}
-                        childId={childId!}
-                        existing={childFoodMap.get(f.id)}
-                        onChange={loadAll}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-            );
-          })}
-        </Tabs>
+            {categories.map(c => {
+              const catFoods = foods.filter(f => f.category_id === c.id);
+              return (
+                <TabsContent key={c.id} value={c.id} className="mt-4">
+                  {catFoods.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground text-sm">
+                      Bu kategoride gıda yok
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {catFoods.map(f => (
+                        <FoodCard
+                          key={f.id}
+                          foodId={f.id}
+                          foodName={f.name}
+                          childId={childId!}
+                          existing={childFoodMap.get(f.id)}
+                          onChange={loadAll}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              );
+            })}
+          </Tabs>
+        )}
       </div>
     </div>
   );
