@@ -31,7 +31,7 @@ const Foods = () => {
       supabase.from('children').select('name').eq('id', childId).maybeSingle(),
       supabase.from('food_categories').select('*').order('sort_order'),
       supabase.from('foods').select('id, name, category_id').order('name'),
-      supabase.from('child_foods').select('id, food_id, reaction, first_tried_date, notes').eq('child_id', childId),
+      supabase.from('child_foods').select('id, food_id, reaction, first_tried_date, notes, try_count').eq('child_id', childId),
     ]);
     if (child) setChildName(child.name);
     if (cats) {

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Trash2 } from "lucide-react";
+import { CalendarIcon, Trash2, Plus, Minus, X } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -17,8 +18,9 @@ export interface ChildFood {
   id: string;
   food_id: string;
   reaction: FoodReaction;
-  first_tried_date: string;
+  first_tried_date: string | null;
   notes: string | null;
+  try_count: number | null;
 }
 
 interface FoodCardProps {
@@ -32,8 +34,9 @@ interface FoodCardProps {
 export const FoodCard = ({ foodId, foodName, childId, existing, onChange }: FoodCardProps) => {
   const [open, setOpen] = useState(false);
   const [reaction, setReaction] = useState<FoodReaction>(existing?.reaction || 'liked');
-  const [date, setDate] = useState<Date>(existing ? new Date(existing.first_tried_date) : new Date());
+  const [date, setDate] = useState<Date | undefined>(existing?.first_tried_date ? new Date(existing.first_tried_date) : undefined);
   const [notes, setNotes] = useState(existing?.notes || "");
+  const [tryCount, setTryCount] = useState<string>(existing?.try_count?.toString() || "");
   const [saving, setSaving] = useState(false);
 
   const reactionMeta = existing ? FOOD_REACTIONS[existing.reaction] : null;
@@ -43,13 +46,15 @@ export const FoodCard = ({ foodId, foodName, childId, existing, onChange }: Food
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
 
+    const parsedCount = tryCount.trim() === "" ? null : parseInt(tryCount, 10);
     const payload = {
       child_id: childId,
       food_id: foodId,
       user_id: user.id,
       reaction,
-      first_tried_date: format(date, 'yyyy-MM-dd'),
+      first_tried_date: date ? format(date, 'yyyy-MM-dd') : null,
       notes: notes.trim() || null,
+      try_count: parsedCount && !isNaN(parsedCount) && parsedCount > 0 ? parsedCount : null,
     };
 
     const { error } = existing
@@ -72,13 +77,20 @@ export const FoodCard = ({ foodId, foodName, childId, existing, onChange }: Food
     onChange();
   };
 
+  const adjustCount = (delta: number) => {
+    const current = parseInt(tryCount, 10) || 0;
+    const next = Math.max(0, current + delta);
+    setTryCount(next === 0 ? "" : next.toString());
+  };
+
   return (
     <Dialog open={open} onOpenChange={(o) => {
       setOpen(o);
       if (o) {
         setReaction(existing?.reaction || 'liked');
-        setDate(existing ? new Date(existing.first_tried_date) : new Date());
+        setDate(existing?.first_tried_date ? new Date(existing.first_tried_date) : undefined);
         setNotes(existing?.notes || "");
+        setTryCount(existing?.try_count?.toString() || "");
       }
     }}>
       <DialogTrigger asChild>
@@ -91,8 +103,15 @@ export const FoodCard = ({ foodId, foodName, childId, existing, onChange }: Food
             <span className="text-xl flex-shrink-0">{existing ? reactionMeta!.emoji : '➕'}</span>
           </div>
           {existing && (
-            <div className="text-[10px] text-muted-foreground mt-1">
-              {format(new Date(existing.first_tried_date), 'd MMM yyyy', { locale: tr })}
+            <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1.5 flex-wrap">
+              {existing.first_tried_date && (
+                <span>{format(new Date(existing.first_tried_date), 'd MMM yyyy', { locale: tr })}</span>
+              )}
+              {existing.try_count && existing.try_count > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-foreground/10 font-semibold">
+                  {existing.try_count}x
+                </span>
+              )}
             </div>
           )}
         </button>
@@ -126,25 +145,52 @@ export const FoodCard = ({ foodId, foodName, childId, existing, onChange }: Food
           </div>
 
           <div>
-            <Label>İlk Deneme Tarihi</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start mt-1">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {format(date, 'd MMMM yyyy', { locale: tr })}
+            <Label>İlk Deneme Tarihi <span className="text-muted-foreground font-normal">(opsiyonel)</span></Label>
+            <div className="flex gap-2 mt-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex-1 justify-start">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, 'd MMMM yyyy', { locale: tr }) : <span className="text-muted-foreground">Tarih seç</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(d) => d && setDate(d)}
+                    disabled={(d) => d > new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              {date && (
+                <Button variant="outline" size="icon" onClick={() => setDate(undefined)}>
+                  <X className="w-4 h-4" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  disabled={(d) => d > new Date()}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label>Deneme Sayısı <span className="text-muted-foreground font-normal">(opsiyonel)</span></Label>
+            <div className="flex items-center gap-2 mt-1">
+              <Button variant="outline" size="icon" onClick={() => adjustCount(-1)}>
+                <Minus className="w-4 h-4" />
+              </Button>
+              <Input
+                type="number"
+                min="0"
+                value={tryCount}
+                onChange={(e) => setTryCount(e.target.value)}
+                placeholder="—"
+                className="text-center"
+              />
+              <Button variant="outline" size="icon" onClick={() => adjustCount(1)}>
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           <div>
