@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, Sparkles, Calendar, Ruler, Scale, Circle, Cake } from "lucide-react";
+import { Trash2, Sparkles, Calendar, Ruler, Scale, Circle, Cake, UtensilsCrossed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { differenceInMonths, differenceInDays, addMonths, differenceInCalendarDays } from "date-fns";
 import { calculateAge } from "@/lib/ageCalculations";
@@ -244,22 +244,30 @@ export const ChildCard = ({ id, name, birthdate, gender, animal, userId, fatherN
       )}
       
       {/* Action Buttons */}
-      <div className="flex gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <Button 
           variant="outline" 
-          className="flex-1 rounded-xl h-12 font-medium border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group/btn"
+          className="rounded-xl h-12 font-medium border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group/btn px-2"
           onClick={() => navigate(`/milestones/${id}`)}
         >
-          <Sparkles className="mr-2 h-4 w-4 group-hover/btn:animate-pulse" />
-          Anılar
+          <Sparkles className="mr-1 h-4 w-4 group-hover/btn:animate-pulse" />
+          <span className="text-xs">Anılar</span>
         </Button>
         <Button 
           variant="outline" 
-          className="flex-1 rounded-xl h-12 font-medium border-green-500/20 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300 group/btn"
+          className="rounded-xl h-12 font-medium border-green-500/20 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300 px-2"
           onClick={() => navigate(`/measurements/${id}`)}
         >
-          <Ruler className="mr-2 h-4 w-4" />
-          Ölçümler
+          <Ruler className="mr-1 h-4 w-4" />
+          <span className="text-xs">Ölçüm</span>
+        </Button>
+        <Button 
+          variant="outline" 
+          className="rounded-xl h-12 font-medium border-orange-500/20 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-300 px-2"
+          onClick={() => navigate(`/foods/${id}`)}
+        >
+          <UtensilsCrossed className="mr-1 h-4 w-4" />
+          <span className="text-xs">Beslenme</span>
         </Button>
       </div>
     </div>
